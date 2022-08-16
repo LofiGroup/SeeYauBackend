@@ -1,7 +1,7 @@
 from ninja import Router
 from ninja.errors import ValidationError, HttpError
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
@@ -37,3 +37,8 @@ def register(request: HttpRequest, data: AuthorizeSchema):
         return create_token(data.email)
     else:
         raise HttpError(status_code=409, message="User with same email already exists.")
+
+
+@auth_router.get("/check", auth=AuthBearer())
+def check(request: HttpRequest):
+    return HttpResponse(status=204)
