@@ -4,4 +4,4 @@ from profile.api import profile_router
 
 api = NinjaAPI()
 api.add_router("/auth", auth_router)
-api.add_router("/profile", profile_router)
+api.add_router("/profiles", profile_router)

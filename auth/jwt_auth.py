@@ -33,4 +33,4 @@ def create_token(username):
     expires_in = datetime.utcnow() + timedelta(minutes=JWT_ACCESS_EXPIRY)
     data = {"sub": username, "exp": expires_in}
     token = jwt.encode(data, JWT_SIGNING_KEY, algorithm="HS256")
-    return TokenSchema(access_token=token)
+    return TokenSchema(access_token=token, expires_in=expires_in)
