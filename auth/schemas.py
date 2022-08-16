@@ -6,5 +6,5 @@ class TokenSchema(Schema):
 
 
 class AuthorizeSchema(Schema):
-    username: str
+    email: str
     password: str
