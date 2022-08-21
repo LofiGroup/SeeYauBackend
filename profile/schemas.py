@@ -1,4 +1,4 @@
-from ninja import Schema
+from ninja import Schema, Field
 
 
 class ProfileUpdate(Schema):
@@ -7,6 +7,6 @@ class ProfileUpdate(Schema):
 
 
 class ProfileRead(Schema):
-    user_id: str
+    user_id: str = Field(alias="user.pk")
     name: str
     img_url: str
