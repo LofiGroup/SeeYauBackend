@@ -1,5 +1,5 @@
 from django.db.models import (Model, CharField, ForeignKey, IntegerField, CASCADE,
-                              OneToOneField, QuerySet, SET, ManyToManyField, DateTimeField)
+                              OneToOneField, QuerySet, SET, ManyToManyField, DateTimeField, BigIntegerField)
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
@@ -16,6 +16,10 @@ def get_sentinel_profile():
     return User.objects.get_or_create(username='deleted')[0]
 
 
+def get_current_time():
+    return datetime.utcnow().timestamp()
+
+
 class Friend(Model):
     friend: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='friends')
     friend_to: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='friends_to')
@@ -30,12 +34,13 @@ class ChatRoom(Model):
 
 class ChatUser(Model):
     chat = ForeignKey(ChatRoom, on_delete=CASCADE)
-    user = ForeignKey(Profile, on_delete=CASCADE)
+    user = ForeignKey(Profile, on_delete=SET(get_sentinel_profile))
+    joined_in = BigIntegerField(default=get_current_time)
 
 
 class ChatMessage(Model):
     message = CharField(max_length=200)
-    created_in = DateTimeField(default=datetime.utcnow)
+    created_in = BigIntegerField(default=get_current_time)
     author = ForeignKey(Profile, on_delete=SET(get_sentinel_profile), related_name='messages')
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name='messages')
 

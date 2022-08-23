@@ -1,5 +1,6 @@
 from ninja import Schema, Field
 from typing import List
+from datetime import datetime
 
 
 class Message(Schema):
@@ -8,12 +9,15 @@ class Message(Schema):
     author: int = Field(alias='author.pk')
 
 
-class ChatBrief(Schema):
-    id: int = Field(alias="pk")
-    users: List[int] = Field(alias='users.user_id')
+class UserBrief(Schema):
+    user_id: int
 
 
-class ChatDetailed(Schema):
+class ChatUpdates(Schema):
     id: int = Field(alias="pk")
-    users: List[int] = Field(alias='users.user_id')
-    messages: List[Message] = Field(alias='messages')
+    new_users: List[UserBrief] = Field(alias='users')
+    new_messages: List[Message] = Field(alias='messages')
+
+
+class ChatUpdateRequest(Schema):
+    from_date: int

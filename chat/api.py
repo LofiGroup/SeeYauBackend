@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from auth.jwt_auth import AuthBearer
 from .models.models import add_friend, remove_friend, get_chat_room
-from .schemas import ChatBrief, ChatDetailed
+from .schemas import ChatUpdates, ChatUpdateRequest
 
 chat_router = Router(auth=AuthBearer())
 
@@ -34,13 +34,19 @@ def remove_friend_route(request, user_id: int):
     return HttpResponse(status=204)
 
 
-@chat_router.get("get-all", response=List[ChatBrief])
-def get_all_chats(request):
+@chat_router.get("get-all-updated", response=List[ChatUpdates])
+def get_all_updates(request, chat_update_request: ChatUpdateRequest):
     user = request.auth
-    return user.profile.chats.all()
+    chats = user.profile.chats.all()
+    from_date = chat_update_request.from_date
 
+    chat_updates = []
 
-@chat_router.get("get-by-id/{chat_id}", response=ChatDetailed)
-def get_chat_by_id(request, chat_id: int):
-    return get_chat_room(chat_id)
-
+    for chat in chats:
+        chat_update = ChatUpdates(
+            id=chat.pk,
+            new_messages=chat.messages.filter(created_in__gt=from_date),
+            new_users=chat.users.filter(joined_in__gt=from_date)
+        )
+        chat_updates.append(chat_update)
+    return chat_updates
