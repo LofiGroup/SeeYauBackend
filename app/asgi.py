@@ -27,11 +27,9 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AllowedHostsOriginValidator(
         TokenAuthMiddleWare(
-            ChatRoomMiddleWare(
-                URLRouter(
-                    chat_websocket_urlpatterns
-                ))
-        )
+            URLRouter(
+                chat_websocket_urlpatterns
+            ))
     )
 })
 

@@ -5,7 +5,7 @@ from channels.db import database_sync_to_async
 
 @database_sync_to_async
 def get_user(token):
-    return validate_token(token)
+    return validate_token(token).profile
 
 
 class TokenAuthMiddleWare:

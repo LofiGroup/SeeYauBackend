@@ -8,18 +8,18 @@
 <body>
     <textarea id="chat-log" cols="100" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
-    {{ room_name|json_script:"room-name" }}
+    <input id="chat-message-submit" type="button" value="Send"><br>
+    Chat room:<br>
+    <input id="chat-room-id" type="text" size="20">
+    {{ token|json_script:"token" }}
     <script>
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const token = JSON.parse(document.getElementById('token').textContent);
 
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
             + '/ws/chat/'
-            + roomName
-            + '/' + "?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZWQiLCJleHAiOjE2NjExMjQ2MTkuOTUyMTMxfQ.RvbhLk3yDA3DTlKhj02wnlVWMiyejIPe0FvwjbChp8g"
-            + "&room_name=1"
+            + "?token=" + token
         );
 
         chatSocket.onmessage = function(e) {
@@ -40,9 +40,13 @@
 
         document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
+            const chatRoomInputDom = document.querySelector('#chat-room-id');
             const message = messageInputDom.value;
+            const chatRoomId = chatRoomInputDom.value
+
             chatSocket.send(JSON.stringify({
-                'message': message
+                'message': message,
+                'chat_room_id': chatRoomId
             }));
             messageInputDom.value = '';
         };

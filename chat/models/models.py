@@ -25,12 +25,12 @@ class Friend(Model):
 
 
 class ChatRoom(Model):
-    users = ManyToManyField(to=Profile, through='ChatUser')
+    users = ManyToManyField(to=Profile, through='ChatUser', related_name='chats')
 
 
 class ChatUser(Model):
     chat = ForeignKey(ChatRoom, on_delete=CASCADE)
-    user = ForeignKey(Profile, on_delete=CASCADE, related_name='chats')
+    user = ForeignKey(Profile, on_delete=CASCADE)
 
 
 class ChatMessage(Model):
@@ -42,6 +42,10 @@ class ChatMessage(Model):
 
 def get_chat_room(room_name):
     return ChatRoom.objects.get(pk=room_name)
+
+
+def get_all_chats(user: Profile):
+    return user.chats.all()
 
 
 def user_in_chat(user, chat):
