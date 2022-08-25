@@ -8,6 +8,7 @@ from random import randint
 from profile.models import Profile
 from chat.exceptions import already_friends_error
 from datetime import datetime
+from utils.utils import current_time_in_millis
 # eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZWQiLCJleHAiOjE2NjEwNDQxNDAuOTAzMDc2fQ.0nQQBzc9_ywAKhxqG3W8_3cJI4eNpz4aqNzAe-JGqqM
 # eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZWQiLCJleHAiOjE2NjExMjQ2MTkuOTUyMTMxfQ.RvbhLk3yDA3DTlKhj02wnlVWMiyejIPe0FvwjbChp8g
 
@@ -33,14 +34,14 @@ class ChatRoom(Model):
 
 
 class ChatUser(Model):
-    chat = ForeignKey(ChatRoom, on_delete=CASCADE)
+    chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name="chatusers")
     user = ForeignKey(Profile, on_delete=SET(get_sentinel_profile))
-    joined_in = BigIntegerField(default=get_current_time)
+    joined_in = BigIntegerField(default=current_time_in_millis)
 
 
 class ChatMessage(Model):
     message = CharField(max_length=200)
-    created_in = BigIntegerField(default=get_current_time)
+    created_in = BigIntegerField(default=current_time_in_millis)
     author = ForeignKey(Profile, on_delete=SET(get_sentinel_profile), related_name='messages')
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name='messages')
 
