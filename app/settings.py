@@ -82,7 +82,10 @@ DATABASES = {
         'USER': 'seeyauapp',
         'PASSWORD': 'Jbs96czkR5',
         'HOST': 'localhost',
-        'PORT': '3306'
+        'PORT': '3306',
+        'TEST': {
+            'NAME': 'test_seeyau'
+        }
     }
 }
 
