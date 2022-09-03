@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import app.local_settings as local_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g+q=j-40jyt7*@aj8vy58jr)^u8^x-40z0@xeg+hi2(10c8l1b'
+SECRET_KEY = local_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = local_settings.DEBUG
 
-ALLOWED_HOSTS = ['192.168.1.105', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
 
 # Application definition
 
@@ -75,19 +76,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'seeyau',
-        'USER': 'seeyauapp',
-        'PASSWORD': 'Jbs96czkR5$zaB9',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'TEST': {
-            'NAME': 'test_seeyau'
-        }
-    }
-}
+DATABASES = local_settings.DATABASES
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -107,14 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)]
-        }
-    }
-}
+CHANNEL_LAYERS = local_settings.CHANNEL_LAYERS
 
 # LOGGING = {
 #     'version': 1,
