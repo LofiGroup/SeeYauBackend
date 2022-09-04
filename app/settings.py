@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import app.local_settings as local_settings
+
+try:
+    import app.local_settings as local_settings
+except ImportError:
+    raise ImportError("You should create local settings python file for django. See app.local_settings_example for "
+                      "details")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
