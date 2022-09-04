@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:5
+    ports:
+      - "6379:6379"
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: mysql ${MYSQL_DATABASE} --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --silent --execute "SELECT 1"
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  seeyau_backend:
+    build: .
+    command: bash -c "python /usr/src/app/manage.py migrate &&
+      python /usr/src/app/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      DEBUG: ${DEBUG}
+      SECRET_KEY: ${SECRET_KEY}
+      PUBLIC_HOST_IP: ${PUBLIC_HOST_IP}
+
+volumes:
+  db:

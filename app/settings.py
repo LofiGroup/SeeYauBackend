@@ -9,14 +9,8 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
-
-try:
-    import app.local_settings as local_settings
-except ImportError:
-    raise ImportError("You should create local settings python file for django. See app.local_settings_example for "
-                      "details")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -25,13 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = local_settings.SECRET_KEY
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = bool(int(os.environ.get("DEBUG", default=1)))
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = local_settings.DEBUG
-
-ALLOWED_HOSTS = local_settings.ALLOWED_HOSTS
+ALLOWED_HOSTS = ['localhost', os.environ.get("PUBLIC_HOST_IP")]
 
 # Application definition
 
@@ -81,7 +72,19 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = local_settings.DATABASES
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE'),
+        'USER': os.environ.get('MYSQL_USER'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+        'HOST': 'db',
+        'PORT': '3306',
+        'TEST': {
+            'NAME': 'test_seeyau'
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -101,7 +104,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CHANNEL_LAYERS = local_settings.CHANNEL_LAYERS
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)]
+        }
+    }
+}
 
 # LOGGING = {
 #     'version': 1,
