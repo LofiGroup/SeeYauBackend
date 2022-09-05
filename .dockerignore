@@ -2,3 +2,7 @@ venv/
 .idea/
 .env
 db/
+docker/
+Dockerfile
+docker-compose.yml
+docker-compose-deploy.yml

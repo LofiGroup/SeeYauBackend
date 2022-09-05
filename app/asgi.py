@@ -15,13 +15,13 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
+django.setup()
+django_asgi_app = get_asgi_application()
+
 from chat.routing import chat_websocket_urlpatterns
 from chat.middleware import ChatRoomMiddleWare
 from auth.middleware import TokenAuthMiddleWare
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
-
-django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,

@@ -19,8 +19,10 @@ services:
       - db:/var/lib/mysql
   seeyau_backend:
     build: .
+    entrypoint: ./deploy-entrypoint.sh
     volumes:
       - ./:/usr/src/app
+      - static:/static
     ports:
       - "8000:8000"
     depends_on:
@@ -33,6 +35,16 @@ services:
       DEBUG: ${DEBUG}
       SECRET_KEY: ${SECRET_KEY}
       PUBLIC_HOST_IP: ${PUBLIC_HOST_IP}
+  nginx:
+    build: ./nginx
+    volumes:
+      - static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - seeyau_backend
+
 
 volumes:
   db:
+  static:
