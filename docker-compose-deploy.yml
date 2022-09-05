@@ -40,30 +40,28 @@ services:
     volumes:
       - static:/static
       - certbot-conf:/etc/nginx/ssl
-      - certbot-data:/usr/share/nginx/html/letsencrypt
+      - certbot-www:/var/www/certbot
     ports:
       - "80:80"
       - "443:443"
     depends_on:
       - seeyau_backend
+    restart: unless-stopped
   certbot:
     image: certbot/certbot:v1.29.0
     depends_on:
       - nginx
     volumes:
       - certbot-conf:/etc/letsencrypt
-      - certbot-logs:/var/log/letsencrypt
-      - certbot-data:/usr/share/nginx/html/letsencrypt
-    command: >
-      sh -c "certonly --webroot --webroot-path=/usr/share/nginx/html/letsencrypt --email "${CERTBOT_EMAIL}" --agree-tos --no-eff-email -d "${DOMAIN_NAME}" &&
-            0 */12 * * * root certbot -q renew --nginx"
+      - certbot-www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --email "${CERTBOT_EMAIL}" --agree-tos --no-eff-email -d "${DOMAIN_NAME}"
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       DOMAIN_NAME: ${DOMAIN_NAME}
+    restart: unless-stopped
 
 volumes:
   db:
   static:
   certbot-conf:
-  certbot-logs:
-  certbot-data:
+  certbot-www:
