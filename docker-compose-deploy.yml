@@ -47,15 +47,19 @@ services:
     depends_on:
       - seeyau_backend
   certbot:
-    image: certbot/certbot:1.7.0
+    image: certbot/certbot:v1.29.0
     depends_on:
       - nginx
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-logs:/var/log/letsencrypt
       - certbot-data:/usr/share/nginx/html/letsencrypt
-    entrypoint: ["sh", "./certbot-entrypoint.sh"]
-
+    command: >
+      sh -c "certonly --webroot --webroot-path=/usr/share/nginx/html/letsencrypt --email "${CERTBOT_EMAIL}" --agree-tos --no-eff-email -d "${DOMAIN_NAME}" &&
+            0 */12 * * * root certbot -q renew --nginx"
+    environment:
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      DOMAIN_NAME: ${DOMAIN_NAME}
 
 volumes:
   db:
