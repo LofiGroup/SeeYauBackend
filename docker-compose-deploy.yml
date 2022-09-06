@@ -46,19 +46,19 @@ services:
       - "443:443"
     depends_on:
       - seeyau_backend
+      - certbot
     restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
   certbot:
     image: certbot/certbot:v1.29.0
-    depends_on:
-      - nginx
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --email "${CERTBOT_EMAIL}" --agree-tos --no-eff-email -d "${DOMAIN_NAME}"
+    command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email "${CERTBOT_EMAIL}" --agree-tos --no-eff-email -d "${DOMAIN_NAME}"
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       DOMAIN_NAME: ${DOMAIN_NAME}
-    restart: unless-stopped
 
 volumes:
   db:
