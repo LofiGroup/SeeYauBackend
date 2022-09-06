@@ -3,12 +3,8 @@ version: '3.9'
 services:
   redis:
     image: redis:5
-    ports:
-      - "6379:6379"
   db:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
@@ -23,8 +19,6 @@ services:
     volumes:
       - ./:/usr/src/app
       - static:/static
-    ports:
-      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -39,16 +33,16 @@ services:
     build: ./nginx
     volumes:
       - static:/static
-      - certbot-conf:/etc/nginx/ssl
+      - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
     ports:
       - "80:80"
       - "443:443"
     depends_on:
       - seeyau_backend
-      - certbot
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
+      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}/
   certbot:
     build: ./certbot
     volumes:
@@ -56,7 +50,10 @@ services:
       - certbot-www:/var/www/certbot
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
+      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}/
       DOMAIN_NAME: ${DOMAIN_NAME}
+    depends_on:
+      - nginx
 
 volumes:
   db:
