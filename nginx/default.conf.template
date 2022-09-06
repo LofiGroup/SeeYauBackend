@@ -3,7 +3,14 @@ upstream backend {
 }
 
 server {
+    server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
     listen 443 ssl;
+
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
+
+    include /etc/nginx/conf.d/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     location / {
         proxy_pass https://backend;
@@ -16,7 +23,6 @@ server {
     location /static/ {
         alias /static/;
     }
-    server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
 }
 
 server {
