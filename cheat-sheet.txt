@@ -1,0 +1,11 @@
+Install libraries from requirements file:
+pip install -r /path/to/requirements.txt
+
+Write dependencies to requirements file:
+pip freeze > requirements.txt
+
+Delete remote git branch:
+git push origin --delete remote_branch
+
+Set git default line-endings format to LF
+git config --global core.autocrlf input

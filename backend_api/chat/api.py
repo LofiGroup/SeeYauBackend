@@ -1,19 +1,12 @@
-from typing import List
-import json
-
 from ninja import Router
-from ninja.errors import ValidationError, HttpError
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from django.core import serializers
 
 from auth.jwt_auth import AuthBearer
-from .models.models import add_friend, remove_friend, get_chat_room
-from .schemas import ChatUpdates, ChatUpdateRequest, chat_to_chat_updates
+from .models.models import add_friend, remove_friend
+from .schemas import chat_to_chat_updates
 
 chat_router = Router(auth=AuthBearer())
 

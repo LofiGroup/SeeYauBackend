@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 
 from ninja import Router
 from typing import List
 
 from auth.jwt_auth import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead
-from .models import Profile, create_profile
+from .models import Profile
 
 from utils.utils import current_time_in_millis
 

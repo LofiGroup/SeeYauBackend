@@ -1,10 +1,9 @@
-from django.db.models import (Model, CharField, ForeignKey, IntegerField, CASCADE,
-                              OneToOneField, QuerySet, SET, ManyToManyField, DateTimeField, BigIntegerField)
+from django.db.models import (Model, CharField, ForeignKey, CASCADE,
+                              SET, ManyToManyField, BigIntegerField)
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
 from django.dispatch import receiver
-from random import randint
 from profile.models import Profile
 from chat.exceptions import already_friends_error
 from datetime import datetime

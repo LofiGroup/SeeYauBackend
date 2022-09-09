@@ -14,11 +14,13 @@ services:
     volumes:
       - db:/var/lib/mysql
   seeyau_backend:
-    build: .
+    build: ./backend_api
     entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
-      - ./:/usr/src/app
-      - static:/static
+      - static:/usr/src/app/static
+      - ./utility:/usr/src/app/utility
+    ports:
+      - "8000:8000"
     depends_on:
       - db
       - redis

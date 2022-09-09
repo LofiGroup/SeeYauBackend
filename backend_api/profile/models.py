@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, ForeignKey, IntegerField, CASCADE, OneToOneField, BigIntegerField
+from django.db.models import Model, CharField, ForeignKey, CASCADE, OneToOneField, BigIntegerField
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver

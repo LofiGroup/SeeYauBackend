@@ -1,4 +1,4 @@
-from django.db import migrations, models
+from django.db import migrations
 from utils.utils import current_time_in_millis
 
 

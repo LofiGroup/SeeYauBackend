@@ -1,7 +1,4 @@
 venv/
 .idea/
 .env
-Dockerfile
-docker-compose.yml
-docker-compose-deploy.yml
 static/

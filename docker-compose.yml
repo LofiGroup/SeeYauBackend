@@ -18,9 +18,10 @@ services:
     volumes:
       - db:/var/lib/mysql
   seeyau_backend:
-    build: .
+    build: ./backend_api
     volumes:
-      - ./:/usr/src/app
+      - ./backend_api:/usr/src/app
+      - ./utility:/usr/src/app/utility
     ports:
       - "8000:8000"
     depends_on:

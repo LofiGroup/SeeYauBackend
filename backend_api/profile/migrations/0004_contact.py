@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import utils.utils
+from utils.utils import current_time_in_millis
 
 
 class Migration(migrations.Migration):
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Contact',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_contact', models.BigIntegerField(default=utils.utils.current_time_in_millis)),
+                ('last_contact', models.BigIntegerField(default=current_time_in_millis)),
                 ('contact', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='profile.profile')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contacts', to='profile.profile')),
             ],

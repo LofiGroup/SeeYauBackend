@@ -1,5 +1,4 @@
 from .jwt_auth import validate_token, authentication_error
-from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from utils.utils import parse_query_string
 
