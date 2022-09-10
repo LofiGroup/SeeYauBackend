@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if ${IS_DEVELOPMENT_VERSION}
+  then echo "There is no need for me in development version. So ciao!" && exit
+fi
+
 if [ ! -f "${KEYS_FOLDER}"/README ]
 then rm -r "${KEYS_FOLDER}" && echo "Deleted dummy certificate"
 fi

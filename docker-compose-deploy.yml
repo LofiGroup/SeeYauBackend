@@ -15,7 +15,7 @@ services:
       - db:/var/lib/mysql
   seeyau_backend:
     build: ./backend_api
-    entrypoint: ["sh", "./deploy-deploy-entrypoint.sh"]
+    entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
       - static:/usr/src/app/static
       - ./utility:/usr/src/app/utility
@@ -28,7 +28,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       DEBUG: ${DEBUG}
       SECRET_KEY: ${SECRET_KEY}
-      PUBLIC_HOST_IP: ${PUBLIC_HOST_IP}
   nginx:
     build: ./nginx
     volumes:
@@ -52,6 +51,7 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
+      IS_DEVELOPMENT_VERSION: ${IS_DEVELOPMENT_VERSION}
     depends_on:
       - nginx
 

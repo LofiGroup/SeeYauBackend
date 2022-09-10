@@ -9,3 +9,6 @@ git push origin --delete remote_branch
 
 Set git default line-endings format to LF
 git config --global core.autocrlf input
+
+Git clone using ssh:
+git clone git@github.com:repo_path
