@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 chmod +x utility/wait_for_it.sh
-sh -c "utility/wait_for_it.sh seeyau_backend:8000 -- echo \"Backend is ready\""
+sh -c "utility/wait_for_it.sh -t 60000 seeyau_backend:8000 -- echo \"Backend is ready\""
 
 # If no certificates are obtained, create dummy ones to start the nginx
 if [ ! -d "${KEYS_FOLDER}" ]
