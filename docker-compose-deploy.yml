@@ -28,6 +28,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       DEBUG: ${DEBUG}
       SECRET_KEY: ${SECRET_KEY}
+      WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
   nginx:
     build: ./nginx
     volumes:
@@ -43,6 +44,7 @@ services:
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
+      WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
   certbot:
     build: ./certbot
     volumes:
@@ -53,6 +55,7 @@ services:
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
       IS_DEVELOPMENT_VERSION: ${IS_DEVELOPMENT_VERSION}
+      WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
     depends_on:
       - nginx
 
