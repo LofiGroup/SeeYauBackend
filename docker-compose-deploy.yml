@@ -15,12 +15,10 @@ services:
       - db:/var/lib/mysql
   seeyau_backend:
     build: ./backend_api
-    entrypoint: ["sh", "./deploy-entrypoint.sh"]
+    entrypoint: ["sh", "./deploy-deploy-entrypoint.sh"]
     volumes:
       - static:/usr/src/app/static
       - ./utility:/usr/src/app/utility
-    ports:
-      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -44,7 +42,7 @@ services:
       - seeyau_backend
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
-      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}/
+      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
   certbot:
     build: ./certbot
     volumes:
@@ -52,7 +50,7 @@ services:
       - certbot-www:/var/www/certbot
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}/
+      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
     depends_on:
       - nginx

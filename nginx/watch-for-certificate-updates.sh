@@ -11,6 +11,6 @@ while sleep 2
     fi
     echo "Watching the certificates" && find "${KEYS_FOLDER}" | entr -p sh -c "echo \"Certificates updated. Reloading nginx...\" && ${RELOAD_NGINX_COMMAND}"
   echo "The directory with certificates is deleted" && CERTS_JUST_DELETED=true
-  else echo "No certificates are present, waiting..."
+  else echo "No certificates are present, waiting..." && CERTS_JUST_DELETED=true
   fi
 done
