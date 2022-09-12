@@ -10,15 +10,17 @@ def get_user(token):
 
 
 class TokenAuthMiddleWare:
-    header: str = b"Authorization"
+    header: str = b"authorization"
 
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
         token = self.get_token_from_header(scope)
+        print(f"Token from header: ${token}")
         if not token:
             token = self.get_token_from_query(scope)
+            print(f"Token from query: ${token}")
 
         user = None if token is None else await get_user(token)
         if user is None:

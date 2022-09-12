@@ -16,7 +16,7 @@
         const token = JSON.parse(document.getElementById('token').textContent);
 
         const chatSocket = new WebSocket(
-            'ws://'
+            'wss://'
             + window.location.host
             + '/ws/chat/'
             + "?token=" + token

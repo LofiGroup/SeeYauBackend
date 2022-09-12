@@ -1,7 +1,6 @@
 FROM python:3.10.7-bullseye
 
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONUNBUFFERED=1
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./

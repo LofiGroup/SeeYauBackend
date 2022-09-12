@@ -3,6 +3,8 @@ version: '3.9'
 services:
   redis:
     image: redis:5
+    ports:
+      - "6379:6379"
   db:
     image: mysql:8.0
     environment:
@@ -11,39 +13,25 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
+    ports:
+      - "3306:3306"
     volumes:
       - db:/var/lib/mysql
-  seeyau_backend:
-    build: ./backend_api
-    volumes:
-      - ./backend_api:/usr/src/app
-      - ./utility:/usr/src/app/utility
-      - static:/static
-    depends_on:
-      - db
-      - redis
-    entrypoint: ./deploy-entrypoint.sh
-    environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      DEBUG: ${DEBUG}
-      SECRET_KEY: ${SECRET_KEY}
-      COMPOSE_DOMAIN_NAME: "backend"
   nginx:
     build: ./nginx
     entrypoint: ./dev-entrypoint.sh
     volumes:
       - static:/static
       - certs:/etc/certs
+      - ./utility:/utility
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      - seeyau_backend
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
       KEYS_FOLDER: /etc/certs/${DOMAIN_NAME}
+      WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
+      BACKEND_ADDRESS: "192.168.1.105:8000"
 
 volumes:
   db:

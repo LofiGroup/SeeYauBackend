@@ -15,11 +15,14 @@ services:
       - db:/var/lib/mysql
   seeyau_backend:
     build: ./backend_api
-    entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
-      - static:/usr/src/app/static
+      - ./backend_api:/usr/src/app
       - ./utility:/usr/src/app/utility
+      - static:/static
       - certs:/etc/certs
+    ports:
+      - "3000:3000"
+    entrypoint: ./deploy-entrypoint.sh
     depends_on:
       - db
       - redis
@@ -29,18 +32,18 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       DEBUG: ${DEBUG}
       SECRET_KEY: ${SECRET_KEY}
+      COMPOSE_DOMAIN_NAME: "backend"
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
-      KEYS_FOLDER: /etc/certs/${DOMAIN_NAME}
       REDIS_HOST: "redis"
       DB_HOST: "db"
-      DOMAIN_NAME: ${DOMAIN_NAME}
-      COMPOSE_DOMAIN_NAME: "backend"
+      KEYS_FOLDER: /etc/certs/${DOMAIN_NAME}
+      DOMAIN_NAME: "192.168.1.105"
   nginx:
     build: ./nginx
+    entrypoint: ./dev-entrypoint.sh
     volumes:
       - static:/static
-      - certbot-conf:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
+      - certs:/etc/certs
       - ./utility:/utility
     ports:
       - "80:80"
@@ -49,25 +52,11 @@ services:
       - seeyau_backend
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
-      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
+      KEYS_FOLDER: /etc/certs/${DOMAIN_NAME}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
       BACKEND_ADDRESS: "seeyau_backend:8000"
-  certbot:
-    build: ./certbot
-    volumes:
-      - certbot-conf:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
-    environment:
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
-      DOMAIN_NAME: ${DOMAIN_NAME}
-      IS_DEVELOPMENT_VERSION: ${IS_DEVELOPMENT_VERSION}
-      WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
-    depends_on:
-      - nginx
 
 volumes:
   db:
   static:
-  certbot-conf:
-  certbot-www:
+  certs:

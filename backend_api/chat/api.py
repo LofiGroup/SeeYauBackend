@@ -33,7 +33,6 @@ def remove_friend_route(request, user_id: int):
 def get_all_updates(request, from_date: int):
     user = request.auth.profile
     chats = user.chats.all()
-    from_date = from_date
 
     chat_updates = chat_to_chat_updates(user, chats, from_date)
 

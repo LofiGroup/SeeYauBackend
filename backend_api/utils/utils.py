@@ -6,4 +6,6 @@ def current_time_in_millis():
 
 
 def parse_query_string(query):
+    if query == b'':
+        return dict()
     return dict((x.split('=') for x in query.decode().split("&")))

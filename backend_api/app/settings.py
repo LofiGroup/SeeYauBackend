@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = bool(int(os.environ.get("DEBUG", default=1)))
 
-ALLOWED_HOSTS = ['localhost', os.environ.get("COMPOSE_DOMAIN_NAME")]
+ALLOWED_HOSTS = ['localhost', os.environ.get("COMPOSE_DOMAIN_NAME"), os.environ.get("DOMAIN_NAME"), "backend"]
 
 # Application definition
 
@@ -78,7 +78,7 @@ DATABASES = {
         'NAME': os.environ.get('MYSQL_DATABASE'),
         'USER': os.environ.get('MYSQL_USER'),
         'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
-        'HOST': 'db',
+        'HOST': os.environ.get("DB_HOST"),
         'PORT': '3306',
         'TEST': {
             'NAME': 'test_seeyau'
@@ -108,7 +108,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('localhost', 'redis')]
+            "hosts": [(os.environ.get("REDIS_HOST"), 6379)]
         }
     }
 }

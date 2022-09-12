@@ -37,8 +37,6 @@ def chat_to_chat_updates(user, chats, from_date):
 
     for chat in chats:
         query = chat.messages.filter(created_in__gt=from_date)
-        if not query.exists():
-            continue
 
         chat_update = {
             "id": chat.pk,

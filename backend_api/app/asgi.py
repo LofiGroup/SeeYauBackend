@@ -9,13 +9,11 @@ https://docs.djangoproject.com/en/4.1/howto/deployment/asgi/
 
 import os
 
-import django
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
-django.setup()
 django_asgi_app = get_asgi_application()
 
 from chat.routing import chat_websocket_urlpatterns
@@ -30,5 +28,3 @@ application = ProtocolTypeRouter({
             ))
     )
 })
-
-# ws://localhost:8000/ws/chat
