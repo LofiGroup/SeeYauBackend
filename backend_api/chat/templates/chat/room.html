@@ -10,7 +10,9 @@
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send"><br>
     Chat room:<br>
-    <input id="chat-room-id" type="text" size="20">
+    <input id="chat-room-id" type="text" size="20"><br>
+    Debug log:<br>
+    <textarea id="debug-log" cols="100" rows="6"></textarea>
     {{ token|json_script:"token" }}
     <script>
         const token = JSON.parse(document.getElementById('token').textContent);
@@ -24,7 +26,11 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            document.querySelector('#debug-log').value += (e.data + '\n');
+
+            if (data.type == 'chat_message') {
+                document.querySelector('#chat-log').value += (data.message.message + '\n');
+            }
         };
 
         chatSocket.onclose = function(e) {
@@ -45,8 +51,9 @@
             const chatRoomId = chatRoomInputDom.value
 
             chatSocket.send(JSON.stringify({
+                'type': 'chat_message',
                 'message': message,
-                'chat_room_id': chatRoomId
+                'chat_id': chatRoomId
             }));
             messageInputDom.value = '';
         };

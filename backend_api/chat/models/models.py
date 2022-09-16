@@ -36,11 +36,13 @@ class ChatUser(Model):
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name="chatusers")
     user = ForeignKey(Profile, on_delete=SET(get_sentinel_profile))
     joined_in = BigIntegerField(default=current_time_in_millis)
+    read_in = BigIntegerField(default=current_time_in_millis)
 
 
 class ChatMessage(Model):
     message = CharField(max_length=200)
     created_in = BigIntegerField(default=current_time_in_millis)
+    updated_in = BigIntegerField(default=current_time_in_millis)
     author = ForeignKey(Profile, on_delete=SET(get_sentinel_profile), related_name='messages')
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name='messages')
 
