@@ -2,14 +2,17 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
-from ninja import Router
-from typing import List
+from ninja import Router, File, Form, UploadedFile
+from typing import List, Optional
+
+from ninja.errors import HttpError
 
 from auth.jwt_auth import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead
 from .models import Profile
 
-from utils.utils import current_time_in_millis
+from utils.utils import current_time_in_millis, save_image
+from utils.models import ErrorMessage
 
 profile_router = Router()
 
@@ -20,16 +23,20 @@ def get_me(request):
     return user.profile
 
 
-@profile_router.put("/me", auth=AuthBearer())
-def update_profile(request, payload: ProfileUpdate):
+@profile_router.post("/me", auth=AuthBearer(), response=ProfileRead)
+def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[UploadedFile] = File(None)):
     user: User = request.auth
-    profile = user.profile
+    profile: Profile = user.profile
 
-    for attr, value in payload:
+    for attr, value in form:
         setattr(profile, attr, value)
-    user.save()
 
-    return HttpResponse(status=204)
+    if image is not None:
+        url = save_image(profile.pk, image)
+        profile.pic = url
+    profile.save()
+
+    return profile
 
 
 @profile_router.get("/contacts", auth=AuthBearer(), response=List[ContactRead])
@@ -37,13 +44,23 @@ def get_contacts(request):
     return request.auth.profile.contacts
 
 
-@profile_router.post("/contact/{user_id}", auth=AuthBearer(), response=ContactRead)
+@profile_router.post("/contact/{user_id}", auth=AuthBearer(), response={200: ContactRead, 405: ErrorMessage})
 def update_contact(request, user_id: int):
     profile = request.auth.profile
-    contacted_profile = get_object_or_404(Profile, pk=user_id)
-    (contact, _) = profile.contacts.update_or_create(contact=contacted_profile, last_contact=current_time_in_millis())
 
-    return contact
+    if profile.pk == user_id:
+        return 405, ErrorMessage.build("You contacted with yourself? Really?")
+
+    contacted_profile = get_object_or_404(Profile, pk=user_id)
+
+    query = profile.contacts.filter(contact=contacted_profile)
+    if query.exists():
+        query.update(last_contact=current_time_in_millis())
+        contact = query.get()
+    else:
+        contact = profile.contacts.create(contact=contacted_profile, last_contact=current_time_in_millis())
+
+    return 200, contact
 
 
 @profile_router.get("/{user_id}", response=ProfileRead, auth=AuthBearer())

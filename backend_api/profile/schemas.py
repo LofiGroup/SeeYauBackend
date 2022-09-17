@@ -1,9 +1,11 @@
 from ninja import Schema, Field
+from django.forms import ModelForm
+from django.conf import settings
+from .models import Profile
 
 
 class ProfileUpdate(Schema):
     name: str
-    img_url: str
 
 
 class ProfileRead(Schema):
@@ -15,5 +17,16 @@ class ProfileRead(Schema):
 class ContactRead(Schema):
     id: int = Field(alias="contact.pk")
     name: str = Field(alias="contact.name")
-    img_url: str = Field(alias="contact.img_url")
+    img_url: str
     last_contact: int
+
+    @staticmethod
+    def resolve_img_url(obj):
+        url = obj.contact.img_url
+        if url == "":
+            return ""
+
+        domain = settings.DOMAIN_NAME
+        media_url = settings.MEDIA_URL
+
+        return f"{domain}{media_url}{url}"

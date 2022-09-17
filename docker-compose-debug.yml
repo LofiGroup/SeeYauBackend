@@ -21,7 +21,8 @@ services:
     build: ./nginx
     entrypoint: ./dev-entrypoint.sh
     volumes:
-      - static:/static
+      - ./backend_api/static:/static
+      - ./backend_api/media:/media
       - certs:/etc/certs
       - ./utility:/utility
     ports:
@@ -35,5 +36,4 @@ services:
 
 volumes:
   db:
-  static:
   certs:
