@@ -2,6 +2,7 @@ import time
 
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
+from django.conf import settings
 
 
 def current_time_in_millis():
@@ -25,3 +26,13 @@ def save_file(file_name: str, file: UploadedFile):
         for chunk in file.chunks():
             destination.write(chunk)
     return file_name
+
+
+def resolve_media_url(url):
+    if url == "":
+        return ""
+
+    domain = settings.DOMAIN_NAME
+    media_url = settings.MEDIA_URL
+
+    return f"https://{domain}{media_url}{url}"

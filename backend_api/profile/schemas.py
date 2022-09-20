@@ -2,6 +2,7 @@ from ninja import Schema, Field
 from django.forms import ModelForm
 from django.conf import settings
 from .models import Profile
+from utils.utils import resolve_media_url
 
 
 class ProfileUpdate(Schema):
@@ -9,9 +10,13 @@ class ProfileUpdate(Schema):
 
 
 class ProfileRead(Schema):
-    user_id: str = Field(alias="user.pk")
+    user_id: str = Field(alias="pk")
     name: str
     img_url: str
+
+    @staticmethod
+    def resolve_img_url(obj):
+        return resolve_media_url(obj.img_url)
 
 
 class ContactRead(Schema):
@@ -22,11 +27,4 @@ class ContactRead(Schema):
 
     @staticmethod
     def resolve_img_url(obj):
-        url = obj.contact.img_url
-        if url == "":
-            return ""
-
-        domain = settings.DOMAIN_NAME
-        media_url = settings.MEDIA_URL
-
-        return f"{domain}{media_url}{url}"
+        return resolve_media_url(obj.contact.img_url)

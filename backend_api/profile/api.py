@@ -19,21 +19,20 @@ profile_router = Router()
 
 @profile_router.get("/me", response=ProfileRead, auth=AuthBearer())
 def get_me(request):
-    user: User = request.auth
-    return user.profile
+    profile = request.auth
+    return profile
 
 
 @profile_router.post("/me", auth=AuthBearer(), response=ProfileRead)
 def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[UploadedFile] = File(None)):
-    user: User = request.auth
-    profile: Profile = user.profile
+    profile: Profile = request.auth
 
     for attr, value in form:
         setattr(profile, attr, value)
 
     if image is not None:
         url = save_image(profile.pk, image)
-        profile.pic = url
+        profile.img_url = url
     profile.save()
 
     return profile
@@ -41,12 +40,12 @@ def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[Upl
 
 @profile_router.get("/contacts", auth=AuthBearer(), response=List[ContactRead])
 def get_contacts(request):
-    return request.auth.profile.contacts
+    return request.auth.contacts
 
 
 @profile_router.post("/contact/{user_id}", auth=AuthBearer(), response={200: ContactRead, 405: ErrorMessage})
 def update_contact(request, user_id: int):
-    profile = request.auth.profile
+    profile = request.auth
 
     if profile.pk == user_id:
         return 405, ErrorMessage.build("You contacted with yourself? Really?")
@@ -65,5 +64,4 @@ def update_contact(request, user_id: int):
 
 @profile_router.get("/{user_id}", response=ProfileRead, auth=AuthBearer())
 def get_user_profile(request, user_id: int):
-    user: User = get_object_or_404(User, pk=user_id)
-    return user.profile
+    return get_object_or_404(Profile, pk=user_id)

@@ -1,11 +1,11 @@
-from .jwt_auth import validate_token, authentication_error
+from .jwt_auth import decrypt_token, authentication_error
 from channels.db import database_sync_to_async
 from utils.utils import parse_query_string
 
 
 @database_sync_to_async
 def get_user(token):
-    user = validate_token(token)
+    user = decrypt_token(token)
     return None if user is None else user.profile
 
 

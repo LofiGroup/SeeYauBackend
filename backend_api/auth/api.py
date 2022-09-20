@@ -2,39 +2,57 @@ from ninja import Router
 from ninja.errors import HttpError
 
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import User
+from django.core.cache import cache
 
-from .schemas import TokenSchema, AuthorizeSchema
-from .jwt_auth import AuthBearer, create_token
+from .schemas import TokenSchema, VerifySchema, StartAuthSchema
+from .jwt_auth import AuthBearer, create_token, AuthKey, create_auth_token
+from profile.models import Profile
+from utils.models import ErrorMessage
+
+import json
 
 auth_router = Router()
-authorization_error = HttpError(status_code=401, message="Incorrect password or email")
 
 
-@auth_router.post("/login", response=TokenSchema)
-def login(request: HttpRequest, data: AuthorizeSchema):
-    try:
-        user_model = get_user_model().objects.get(username=data.email)
-    except get_user_model().DoesNotExist:
-        raise authorization_error
-
-    if not check_password(data.password, user_model.password):
-        raise authorization_error
-
-    return create_token(data.email)
-
-
-@auth_router.post("/register", response=TokenSchema)
-def register(request: HttpRequest, data: AuthorizeSchema):
-    try:
-        get_user_model().objects.get(username=data.email)
-    except get_user_model().DoesNotExist:
-        User.objects.create_user(username=data.email, password=data.password)
-        return create_token(data.email)
+def auth(name: str, phone_number: str):
+    query = Profile.objects.filter(phone_number=phone_number)
+    if query.exists():
+        query.update(name=name)
     else:
-        raise HttpError(status_code=409, message="User with the same email already exists.")
+        Profile.objects.create(name=name, phone_number=phone_number)
+
+    return create_token(phone_number)
+
+
+def verify_request_is_valid(data: VerifySchema, verify: dict):
+    return verify['code'] == data.code
+
+
+@auth_router.post("/verify", response={200: TokenSchema, 401: ErrorMessage}, auth=AuthKey())
+def verify_code(request: HttpRequest, data: VerifySchema):
+    phone_number = request.auth
+    if phone_number is None:
+        return 401, ErrorMessage.build("Authentication error")
+
+    json_data = json.loads(cache.get(phone_number))
+    if json_data is None:
+        return 401, ErrorMessage.build("Authentication error")
+
+    if verify_request_is_valid(data, json_data):
+        cache.delete(phone_number)
+        return 200, auth(json_data['name'], json_data['phone_number'])
+    return 401, ErrorMessage.build("Wrong code")
+
+
+@auth_router.post("/start", response=TokenSchema)
+def start(request: HttpRequest, data: StartAuthSchema):
+    cached_data: str = json.dumps({
+        'name': data.name,
+        'phone_number': data.phone_number,
+        'code': "1234",
+    })
+    cache.set(data.phone_number, cached_data, 5 * 60000)
+    return create_auth_token(data.phone_number)
 
 
 @auth_router.get("/check", auth=AuthBearer())
