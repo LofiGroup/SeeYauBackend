@@ -27,8 +27,8 @@ def get_me(request):
 def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[UploadedFile] = File(None)):
     profile: Profile = request.auth
 
-    for attr, value in form:
-        setattr(profile, attr, value)
+    if form.name != "":
+        profile.name = form.name
 
     if image is not None:
         url = save_image(profile.pk, image)
