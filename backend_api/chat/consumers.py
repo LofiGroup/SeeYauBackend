@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 from django.db.models import ObjectDoesNotExist
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -16,7 +17,13 @@ class WebsocketRequest:
 class WebsocketResponse:
     CHAT_MESSAGE: str = "chat_message"
     CHAT_IS_READ: str = "chat_is_read"
+    USER_ONLINE_STATUS_CHANGED: str = "online_status_changed"
     ERROR: str = "error"
+
+
+class OnlineStatus(Enum):
+    OFFLINE = 0
+    ONLINE = 1
 
 
 class WebsocketError:
@@ -64,6 +71,15 @@ def get_user_chat_rooms(user):
     return chats
 
 
+@database_sync_to_async
+def set_user_online_status(user: Profile, status: OnlineStatus):
+    if status is OnlineStatus.OFFLINE:
+        user.last_seen = current_time_in_millis()
+    else:
+        user.last_seen = 0
+    user.save()
+
+
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,6 +89,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print("Connecting to websocket...")
         await self.accept()
         user = self.scope['user']
+
         chats = await get_user_chat_rooms(user)
         self.room_group_names.extend(chats)
 
@@ -80,12 +97,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(room_name, self.channel_name)
         print("Successfully connected to websocket!")
 
+        await self.notify_online_status_changed(status=OnlineStatus.ONLINE)
+
     async def disconnect(self, code):
         print(f"Disconnecting from websocket... Code: {code}")
+
+        await self.notify_online_status_changed(status=OnlineStatus.OFFLINE)
+
         for room_group_name in self.room_group_names:
             await self.channel_layer.group_discard(
                 room_group_name,
                 self.channel_name
+            )
+
+    async def notify_online_status_changed(self, status: OnlineStatus):
+        user: Profile = self.scope['user']
+        await set_user_online_status(user, status)
+
+        for room_group_name in self.room_group_names:
+            await self.channel_layer.group_send(
+                room_group_name,
+                {
+                    'type': 'response',
+                    'response_type': WebsocketResponse.USER_ONLINE_STATUS_CHANGED,
+                    'user_id': user.pk
+                }
             )
 
     async def receive(self, text_data=None, bytes_data=None):

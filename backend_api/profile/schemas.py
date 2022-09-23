@@ -13,6 +13,7 @@ class ProfileRead(Schema):
     user_id: str = Field(alias="pk")
     name: str
     img_url: str
+    last_seen: int
 
     @staticmethod
     def resolve_img_url(obj):
@@ -23,6 +24,7 @@ class ContactRead(Schema):
     id: int = Field(alias="contact.pk")
     name: str = Field(alias="contact.name")
     img_url: str
+    last_seen: int = Field(alias="contact.last_seen")
     last_contact: int
 
     @staticmethod

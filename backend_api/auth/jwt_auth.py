@@ -11,17 +11,18 @@ from calendar import timegm
 from .schemas import TokenSchema
 from profile.models import Profile
 from utils.utils import current_time_in_millis
+from utils import time_constants as Time
 
 JWT_SIGNING_KEY = os.getenv("JWT_SIGNING_KEY", "a6a55085a15096a760daa91f0367c42be390f88a9403296c1c384a474b62a")
-JWT_ACCESS_EXPIRY = os.getenv("JWT_ACCESS_EXPIRY", 60 * 24)
+JWT_ACCESS_EXPIRY = os.getenv("JWT_ACCESS_EXPIRY", 3 * Time.month)
 
 AUTH_ONLY_SIGNING_KEY = os.getenv("AUTH_ONLY_SIGNING_KEY", "a6a55085a15096a760daa9726h67c42be390f88a9403296c1c384ahjsb62a")
-AUTH_ONLY_ACCESS_EXPIRY = os.getenv("AUTH_ONLY_ACCESS_EXPIRY", 5)
+AUTH_ONLY_ACCESS_EXPIRY = os.getenv("AUTH_ONLY_ACCESS_EXPIRY", 5 * Time.minute)
 
 authentication_error = HttpError(status_code=401, message="Authentication error")
 
 
-def decrypt_token(token: str, key: str):
+def decrypt_token(token: str, key: str = JWT_SIGNING_KEY):
     try:
         payload = jwt.decode(token, key, algorithms=["HS256"])
 
@@ -32,15 +33,16 @@ def decrypt_token(token: str, key: str):
         expires_in: int = payload.get("exp")
         if expires_in < datetime.utcnow().timestamp():
             return None
-    except jwt.PyJWTError as e:
-        print(f"Error {e}")
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.PyJWTError:
         return None
     return data
 
 
 class AuthBearer(HttpBearer):
     def authenticate(self, request: HttpRequest, token: str):
-        phone_number = decrypt_token(token, key=JWT_SIGNING_KEY)
+        phone_number = decrypt_token(token)
         if not phone_number:
             return None
         return get_object_or_404(Profile, phone_number=phone_number)
@@ -54,15 +56,15 @@ class AuthKey(APIKeyQuery):
 
 
 def create_token(phone_number: str):
-    expires_in = current_time_in_millis() + AUTH_ONLY_ACCESS_EXPIRY
-    data = {"sub": phone_number, "exp": expires_in}
-    token = jwt.encode(data, JWT_SIGNING_KEY, algorithm="HS256")
-    return TokenSchema(access_token=token)
+    return get_new_token(phone_number, JWT_SIGNING_KEY, JWT_ACCESS_EXPIRY)
 
 
 def create_auth_token(phone_number: str):
-    timegm(datetime.now(tz=timezone.utc).utctimetuple())
-    expires_in = current_time_in_millis() + AUTH_ONLY_ACCESS_EXPIRY
-    data = {"sub": phone_number, "exp": expires_in}
-    token = jwt.encode(data, AUTH_ONLY_SIGNING_KEY, algorithm="HS256")
+    return get_new_token(phone_number, AUTH_ONLY_SIGNING_KEY, AUTH_ONLY_ACCESS_EXPIRY)
+
+
+def get_new_token(data: str, key: str, expiry: int):
+    expires_in = (current_time_in_millis() + expiry) // 1000
+    data = {"sub": data, "exp": expires_in}
+    token = jwt.encode(data, key, algorithm="HS256")
     return TokenSchema(access_token=token)

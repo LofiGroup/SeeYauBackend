@@ -1,12 +1,21 @@
-from .jwt_auth import decrypt_token, authentication_error
+from django.shortcuts import get_object_or_404
+from django.db.models import ObjectDoesNotExist
 from channels.db import database_sync_to_async
+
+from .jwt_auth import decrypt_token, authentication_error
 from utils.utils import parse_query_string
+from profile.models import Profile
 
 
 @database_sync_to_async
 def get_user(token):
-    user = decrypt_token(token)
-    return None if user is None else user.profile
+    phone_number = decrypt_token(token)
+    if not phone_number:
+        return None
+    try:
+        return Profile.objects.filter(phone_number=phone_number).get()
+    except ObjectDoesNotExist:
+        return None
 
 
 class TokenAuthMiddleWare:
@@ -17,10 +26,8 @@ class TokenAuthMiddleWare:
 
     async def __call__(self, scope, receive, send):
         token = self.get_token_from_header(scope)
-        print(f"Token from header: ${token}")
         if not token:
             token = self.get_token_from_query(scope)
-            print(f"Token from query: ${token}")
 
         user = None if token is None else await get_user(token)
         if user is None:
