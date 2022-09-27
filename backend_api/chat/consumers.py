@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+
 from django.db.models import ObjectDoesNotExist
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -18,6 +19,7 @@ class WebsocketResponse:
     CHAT_MESSAGE: str = "chat_message"
     CHAT_IS_READ: str = "chat_is_read"
     USER_ONLINE_STATUS_CHANGED: str = "online_status_changed"
+    NEW_CHAT_IS_CREATED: str = "new_chat_is_created"
     ERROR: str = "error"
 
 
@@ -83,17 +85,19 @@ def set_user_online_status(user: Profile, status: OnlineStatus):
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.room_group_names = []
+        self.chat_group_names = []
+        self.channel_name = ""
 
     async def connect(self):
         print("Connecting to websocket...")
         await self.accept()
         user = self.scope['user']
+        self.channel_name = f"user_{user.pk}"
 
         chats = await get_user_chat_rooms(user)
-        self.room_group_names.extend(chats)
+        self.chat_group_names.extend(chats)
 
-        for room_name in self.room_group_names:
+        for room_name in self.chat_group_names:
             await self.channel_layer.group_add(room_name, self.channel_name)
         print("Successfully connected to websocket!")
 
@@ -104,21 +108,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.notify_online_status_changed(status=OnlineStatus.OFFLINE)
 
-        for room_group_name in self.room_group_names:
-            await self.channel_layer.group_discard(
-                room_group_name,
-                self.channel_name
-            )
+        for room_group_name in self.chat_group_names:
+            await self.channel_layer.group_discard(room_group_name, self.channel_name)
 
     async def notify_online_status_changed(self, status: OnlineStatus):
         user: Profile = self.scope['user']
         await set_user_online_status(user, status)
 
-        for room_group_name in self.room_group_names:
+        for room_group_name in self.chat_group_names:
             await self.channel_layer.group_send(
                 room_group_name,
                 {
-                    'type': 'response',
+                    'type': 'chat_response',
                     'response_type': WebsocketResponse.USER_ONLINE_STATUS_CHANGED,
                     'user_id': user.pk
                 }
@@ -150,7 +151,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             f'chat_{chat_id}',
             {
-                'type': 'response',
+                'type': 'chat_response',
                 'response_type': WebsocketResponse.CHAT_IS_READ,
                 'chat_id': chat_id,
                 'user_id': user.pk,
@@ -172,7 +173,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             f'chat_{chat_id}',
             {
-                'type': 'response',
+                'type': 'chat_response',
                 'response_type': WebsocketResponse.CHAT_MESSAGE,
                 'chat_id': chat_id,
                 'message': chat_message_to_dict(message)
@@ -194,7 +195,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'error_message': message
         }))
 
-    async def response(self, event):
+    async def connect_to_new_chat(self, event):
+        chat_id = event['chat_id']
+        room_name = f"chat_{chat_id}"
+
+        self.chat_group_names.append(room_name)
+        await self.channel_layer.group_add(room_name, self.channel_name)
+
+        await self.send(text_data=json.dumps({
+            'type': "chat",
+            "data": {
+                "response_type": WebsocketResponse.NEW_CHAT_IS_CREATED,
+                "chat_id": chat_id
+            }
+        }))
+
+    async def chat_response(self, event):
         await self.send(text_data=json.dumps(
-            event
+            {
+                "type": "chat",
+                "data": event
+            }
         ))

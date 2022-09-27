@@ -2,14 +2,12 @@ from django.db.models import (Model, CharField, ForeignKey, CASCADE,
                               SET, ManyToManyField, BigIntegerField)
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from django.db.utils import IntegrityError
 from django.dispatch import receiver
 from profile.models import Profile
-from chat.exceptions import already_friends_error
 from datetime import datetime
 from utils.utils import current_time_in_millis
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZWQiLCJleHAiOjE2NjEwNDQxNDAuOTAzMDc2fQ.0nQQBzc9_ywAKhxqG3W8_3cJI4eNpz4aqNzAe-JGqqM
-# eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZWQiLCJleHAiOjE2NjExMjQ2MTkuOTUyMTMxfQ.RvbhLk3yDA3DTlKhj02wnlVWMiyejIPe0FvwjbChp8g
+from profile.models import Contact
+from chat.consumer_api import notify_new_chat_is_created
 
 
 def get_sentinel_profile():
@@ -59,32 +57,18 @@ def user_in_chat(user, chat):
     return chat.users.filter(pk=user.pk).exists()
 
 
-def get_friends(profile: Profile):
-    return profile.friends.all()
+def is_contacted_with(profile: Profile, contacted_with: Profile):
+    return contacted_with.contacts.filter(contact=profile).exists()
 
 
-def add_friend(profile: Profile, friend_to: Profile):
-    if profile.pk == friend_to.pk:
-        raise already_friends_error
-    try:
-        profile.friends.create(friend_to=friend_to)
-    except IntegrityError:
-        raise already_friends_error
-
-
-def remove_friend(profile: Profile, friend_to: Profile):
-    profile.friends.filter(friend_to=friend_to).delete()
-
-
-def is_friends_with(profile: Profile, potential_friend: Profile):
-    return potential_friend.friends.filter(friend_to=profile).exists()
-
-
-@receiver(post_save, sender=Friend)
-def check_if_mutual_friends(sender, instance: Friend, created, **kwargs):
+@receiver(post_save, sender=Contact)
+def check_if_contact_is_mutual(sender, instance: Contact, created, **kwargs):
     if created:
-        if is_friends_with(instance.friend, instance.friend_to):
+        if is_contacted_with(instance.user, instance.contact):
             chat = ChatRoom.objects.create()
-            chat.users.add(instance.friend)
-            chat.users.add(instance.friend_to)
+            chat.users.add(instance.user)
+            chat.users.add(instance.contact)
+
+            notify_new_chat_is_created(instance.user, chat.pk)
+            notify_new_chat_is_created(instance.contact, chat.pk)
 
