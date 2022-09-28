@@ -120,11 +120,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await set_user_online_status(user, status)
 
         for room_group_name in self.chat_group_names:
-            await self.channel_layer.group_send(
+            await self.send_to_chat(
                 room_group_name,
                 {
-                    'type': 'response',
-                    'response_type': WebsocketResponse.USER_ONLINE_STATUS_CHANGED,
+                    'type': WebsocketResponse.USER_ONLINE_STATUS_CHANGED,
                     'user_id': user.pk
                 }
             )
@@ -152,7 +151,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if self.request_is_invalid(result, int):
             return
 
-        await self.channel_layer.group_send(
+        await self.send_to_chat(
             f'chat_{chat_id}',
             {
                 'type': 'response',
@@ -174,11 +173,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if await self.request_is_invalid(message, ChatMessage):
             return
 
-        await self.channel_layer.group_send(
+        await self.send_to_chat(
             f'chat_{chat_id}',
             {
-                'type': 'response',
-                'response_type': WebsocketResponse.CHAT_MESSAGE,
+                'type': WebsocketResponse.CHAT_MESSAGE,
                 'chat_id': chat_id,
                 'message': chat_message_to_dict(message)
             }
@@ -214,10 +212,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         }))
 
-    async def response(self, event):
-        await self.send(text_data=json.dumps(
+    async def send_to_chat(self, room_name, data):
+        await self.channel_layer.group_send(
+            room_name,
             {
                 "type": "chat",
-                "data": event
+                "data": data
             }
+        )
+
+    async def chat(self, event):
+        await self.send(text_data=json.dumps(
+            event
         ))
