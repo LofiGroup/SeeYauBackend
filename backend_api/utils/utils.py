@@ -5,6 +5,9 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
 from django.conf import settings
 
 
+IS_ONLINE = 5555555555555
+
+
 def current_time_in_millis():
     return time.time_ns() // 1_000_000
 

@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from .models.models import ChatMessage, get_all_chats, ChatRoom, ChatUser
 from profile.models import Profile
 from .schemas import chat_message_to_dict
-from utils.utils import current_time_in_millis
+from utils.utils import current_time_in_millis, IS_ONLINE
 
 
 class WebsocketRequest:
@@ -78,7 +78,7 @@ def set_user_online_status(user: Profile, status: OnlineStatus):
     if status is OnlineStatus.OFFLINE:
         user.last_seen = current_time_in_millis()
     else:
-        user.last_seen = 0
+        user.last_seen = IS_ONLINE
     user.save()
 
 
@@ -118,6 +118,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def notify_online_status_changed(self, status: OnlineStatus):
         user: Profile = self.scope['user']
         await set_user_online_status(user, status)
+        print(f"User status is changed: user_id: {user.pk}")
 
         for room_group_name in self.chat_group_names:
             await self.send_to_chat(
@@ -222,6 +223,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat(self, event):
+        print(f"Sending through websocket: {event}")
         await self.send(text_data=json.dumps(
             event
         ))

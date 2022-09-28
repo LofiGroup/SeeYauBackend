@@ -62,6 +62,10 @@ def update_contact(request, user_id: int):
     return 200, contact
 
 
-@profile_router.get("/{user_id}", response=ProfileRead, auth=AuthBearer())
+@profile_router.get("/{user_id}", response=ContactRead, auth=AuthBearer())
 def get_user_profile(request, user_id: int):
-    return get_object_or_404(Profile, pk=user_id)
+    contacts = request.auth.contacts
+    query = contacts.filter(contact__pk=user_id)
+    if query.exists():
+        return query.get()
+    raise HttpError(status_code=404, message="No user with this id")
