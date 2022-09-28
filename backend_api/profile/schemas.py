@@ -1,7 +1,4 @@
 from ninja import Schema, Field
-from django.forms import ModelForm
-from django.conf import settings
-from .models import Profile
 from utils.utils import resolve_media_url
 
 

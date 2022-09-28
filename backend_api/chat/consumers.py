@@ -86,16 +86,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.chat_group_names = []
-        self.channel_name = ""
+        self.user_room = ""
 
     async def connect(self):
         print("Connecting to websocket...")
         await self.accept()
         user = self.scope['user']
-        self.channel_name = f"user_{user.pk}"
+        self.user_room = f"user_{user.pk}"
 
         chats = await get_user_chat_rooms(user)
         self.chat_group_names.extend(chats)
+
+        await self.channel_layer.group_add(self.user_room, self.channel_name)
 
         for room_name in self.chat_group_names:
             await self.channel_layer.group_add(room_name, self.channel_name)
@@ -108,6 +110,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.notify_online_status_changed(status=OnlineStatus.OFFLINE)
 
+        await self.channel_layer.group_discard(self.user_room, self.channel_name)
+
         for room_group_name in self.chat_group_names:
             await self.channel_layer.group_discard(room_group_name, self.channel_name)
 
@@ -119,7 +123,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 room_group_name,
                 {
-                    'type': 'chat_response',
+                    'type': 'response',
                     'response_type': WebsocketResponse.USER_ONLINE_STATUS_CHANGED,
                     'user_id': user.pk
                 }
@@ -151,7 +155,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             f'chat_{chat_id}',
             {
-                'type': 'chat_response',
+                'type': 'response',
                 'response_type': WebsocketResponse.CHAT_IS_READ,
                 'chat_id': chat_id,
                 'user_id': user.pk,
@@ -173,7 +177,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             f'chat_{chat_id}',
             {
-                'type': 'chat_response',
+                'type': 'response',
                 'response_type': WebsocketResponse.CHAT_MESSAGE,
                 'chat_id': chat_id,
                 'message': chat_message_to_dict(message)
@@ -210,7 +214,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         }))
 
-    async def chat_response(self, event):
+    async def response(self, event):
         await self.send(text_data=json.dumps(
             {
                 "type": "chat",
