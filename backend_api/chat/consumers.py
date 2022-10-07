@@ -146,17 +146,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def mark_as_read(self, data, user):
         chat_id = data['chat_id']
 
-        print(f"User marked chat {chat_id} as read")
         result = await mark_chat_as_read(chat_id, user)
 
-        if self.request_is_invalid(result, int):
+        if await self.request_is_invalid(result, int):
             return
 
         await self.send_to_chat(
             f'chat_{chat_id}',
             {
-                'type': 'response',
-                'response_type': WebsocketResponse.CHAT_IS_READ,
+                'type': WebsocketResponse.CHAT_IS_READ,
                 'chat_id': chat_id,
                 'user_id': user.pk,
                 'read_in': result
@@ -208,7 +206,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': "chat",
             "data": {
-                "response_type": WebsocketResponse.NEW_CHAT_IS_CREATED,
+                "type": WebsocketResponse.NEW_CHAT_IS_CREATED,
                 "chat_id": chat_id
             }
         }))

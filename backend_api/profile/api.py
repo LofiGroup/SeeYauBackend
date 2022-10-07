@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from django.http import HttpResponse
 
 from ninja import Router, File, Form, UploadedFile
 from typing import List, Optional
@@ -11,7 +9,7 @@ from auth.jwt_auth import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead
 from .models import Profile
 
-from utils.utils import current_time_in_millis, save_image
+from utils.utils import current_time_in_millis, save_image, delete_media
 from utils.models import ErrorMessage
 
 profile_router = Router()
@@ -32,6 +30,7 @@ def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[Upl
 
     if image is not None:
         url = save_image(profile.pk, image)
+        delete_media(profile.img_url)
         profile.img_url = url
     profile.save()
 

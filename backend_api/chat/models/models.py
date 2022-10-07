@@ -1,8 +1,7 @@
 from django.db.models import (Model, CharField, ForeignKey, CASCADE,
                               SET, ManyToManyField, BigIntegerField)
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+
 from profile.models import Profile
 from datetime import datetime
 from utils.utils import current_time_in_millis
@@ -55,20 +54,4 @@ def get_all_chats(user: Profile):
 
 def user_in_chat(user, chat):
     return chat.users.filter(pk=user.pk).exists()
-
-
-def is_contacted_with(profile: Profile, contacted_with: Profile):
-    return contacted_with.contacts.filter(contact=profile).exists()
-
-
-@receiver(post_save, sender=Contact)
-def check_if_contact_is_mutual(sender, instance: Contact, created, **kwargs):
-    if created:
-        if is_contacted_with(instance.user, instance.contact):
-            chat = ChatRoom.objects.create()
-            chat.users.add(instance.user)
-            chat.users.add(instance.contact)
-
-            notify_new_chat_is_created(instance.user, chat.pk)
-            notify_new_chat_is_created(instance.contact, chat.pk)
 

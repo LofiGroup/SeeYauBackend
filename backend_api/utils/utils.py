@@ -1,4 +1,6 @@
 import time
+import os
+from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile, UploadedFile
@@ -18,10 +20,20 @@ def parse_query_string(query):
     return dict((x.split('=') for x in query.decode().split("&")))
 
 
-def save_image(file_id: str, file: UploadedFile):
+def save_image(user_id: str, file: UploadedFile):
     ext = file.name.split(".")[-1]
-    file_path = f"images/profile/{file_id}.{ext}"
+    file_path = f"images/profile/{user_id}_{current_time_in_millis()}.{ext}"
     return save_file(file_path, file)
+
+
+def delete_media(path: str):
+    if path == settings.DEFAULT_IMAGE_PATH:
+        return
+    path = Path(settings.MEDIA_ROOT + path)
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
 
 
 def save_file(file_name: str, file: UploadedFile):

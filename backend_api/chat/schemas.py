@@ -6,20 +6,6 @@ import json
 from .models.models import ChatMessage, ChatUser
 
 
-class Message(Schema):
-    message: str
-    created_in: int
-    author: int = Field(alias='author.pk')
-
-
-class UserBrief(Schema):
-    user_id: int
-
-
-class ChatUpdateRequest(Schema):
-    from_date: int
-
-
 def chat_message_to_dict(message: ChatMessage):
     return {
         "id": message.pk,
@@ -28,10 +14,6 @@ def chat_message_to_dict(message: ChatMessage):
         "author": message.author.pk,
         "chat_id": message.chat.pk
     }
-
-
-def chat_message_to_json(message):
-    return json.dumps(chat_message_to_dict(message))
 
 
 def chat_to_chat_updates(user, chats, from_date):
