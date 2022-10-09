@@ -7,6 +7,7 @@ from django.core.cache import cache
 from .schemas import TokenSchema, VerifySchema, StartAuthSchema
 from .jwt_auth import AuthBearer, create_token, AuthKey, create_auth_token
 from profile.models import Profile
+from profile.model_dao import create_or_update_profile
 from utils.models import ErrorMessage
 
 import json
@@ -15,11 +16,7 @@ auth_router = Router()
 
 
 def auth(name: str, phone_number: str):
-    query = Profile.objects.filter(phone_number=phone_number)
-    if query.exists():
-        query.update(name=name)
-    else:
-        Profile.objects.create(name=name, phone_number=phone_number)
+    create_or_update_profile(name, phone_number)
 
     return create_token(phone_number)
 

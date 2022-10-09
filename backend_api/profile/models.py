@@ -1,7 +1,5 @@
 from django.db.models import Model, CharField, ForeignKey, CASCADE, OneToOneField, BigIntegerField, ImageField
-from django.contrib.auth.models import User
 
-from random import randint
 from utils.utils import current_time_in_millis
 
 
@@ -19,10 +17,3 @@ class Contact(Model):
 
     class Meta:
         unique_together = [('user', 'contact')]
-
-
-def create_profile(user: User, name: str = ""):
-    if name == "":
-        name = f"User{randint(0, 10000)}"
-
-    return Profile.objects.create(user=user, name=name)

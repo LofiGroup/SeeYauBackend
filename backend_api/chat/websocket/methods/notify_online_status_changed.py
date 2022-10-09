@@ -2,6 +2,7 @@ from enum import Enum
 from channels.db import database_sync_to_async
 
 from profile.models import Profile
+from profile.model_dao import set_user_is_online, set_user_is_offline
 from utils.utils import current_time_in_millis, IS_ONLINE
 from app.websocket.base_consumer import Method
 
@@ -14,10 +15,9 @@ class OnlineStatus(Enum):
 @database_sync_to_async
 def set_user_online_status(user: Profile, status: OnlineStatus):
     if status is OnlineStatus.OFFLINE:
-        user.last_seen = current_time_in_millis()
+        set_user_is_online(user.pk)
     else:
-        user.last_seen = IS_ONLINE
-    user.save()
+        set_user_is_online(user.pk)
 
 
 class NotifyUserOnlineStatusChangedMethod(Method):
@@ -28,7 +28,7 @@ class NotifyUserOnlineStatusChangedMethod(Method):
     async def process(consumer, data):
         user: Profile = consumer.scope['user']
 
-        await set_user_online_status(user, data)
+        # await set_user_online_status(user, data)
         print(f"User status is changed: user_id: {user.pk}")
 
         for room_group_name in consumer.chat_group_names:
