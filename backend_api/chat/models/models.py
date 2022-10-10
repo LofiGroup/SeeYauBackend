@@ -37,7 +37,7 @@ class ChatUser(Model):
 
 
 class ChatMessage(Model):
-    message = CharField(max_length=200)
+    message = CharField(max_length=2000)
     created_in = BigIntegerField(default=current_time_in_millis)
     updated_in = BigIntegerField(default=current_time_in_millis)
     author = ForeignKey(Profile, on_delete=SET(get_sentinel_profile), related_name='messages')
