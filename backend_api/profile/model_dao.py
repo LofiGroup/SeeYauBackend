@@ -14,11 +14,11 @@ def create_or_update_profile(name: str, phone_number: str):
 def set_user_is_online(user_id: int):
     query = Profile.objects.filter(pk=user_id)
     if query.exists():
-        query.update(last_seen=current_time_in_millis())
+        query.update(last_seen=IS_ONLINE)
 
 
 def set_user_is_offline(user_id: int):
     query = Profile.objects.filter(pk=user_id)
     if query.exists():
-        query.update(last_seen=IS_ONLINE)
+        query.update(last_seen=current_time_in_millis())
 

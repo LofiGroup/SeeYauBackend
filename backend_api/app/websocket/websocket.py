@@ -45,6 +45,3 @@ class MainConsumer(AsyncWebsocketConsumer):
             'data': event['data']
         }))
 
-    async def on_event(self, event):
-        self.consumers[event['type']].on_receive_message(event['data'])
-

@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseNot
 
 from auth.jwt_auth import AuthBearer
 from .schemas import chat_to_chat_updates, chat_to_chat_update
+from .models.models import ChatRoom
 from profile.models import Profile
 
 chat_router = Router(auth=AuthBearer())
@@ -19,7 +20,7 @@ def get_all_updates(request, from_date: int):
     return JsonResponse(chat_updates, safe=False)
 
 
-@chat_router.get("get_chat_updates/{chat_id}")
+@chat_router.get("get-chat-updates/{chat_id}")
 def get_chat_updates(request, chat_id: int, from_date: int = 0):
     user = request.auth
     query = user.chats.filter(pk=chat_id)

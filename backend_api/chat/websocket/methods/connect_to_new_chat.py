@@ -25,18 +25,22 @@ class ConnectToNewChatMethod(Method):
         })
 
 
-def is_contacted_with(profile: Profile, contacted_with: Profile):
-    return contacted_with.contacts.filter(contact=profile).exists()
-
-
 @receiver(post_save, sender=Contact)
 def check_if_contact_is_mutual(sender, instance: Contact, created, **kwargs):
     if created:
-        if is_contacted_with(instance.user, instance.contact):
+        other_contact = Contact.objects.filter(user=instance.contact, contact=instance.user)
+        if other_contact.exists():
+            instance.is_mutual = 1
+            instance.save()
+            other_contact.update(is_mutual=1)
+
             chat = ChatRoom.objects.create()
             chat.users.add(instance.user)
             chat.users.add(instance.contact)
 
-            data = {'type': ConnectToNewChatMethod.type, 'chat_id': chat.pk}
-            on_event(instance.user, data)
-            on_event(instance.contact, data)
+            data = {
+                'type': ConnectToNewChatMethod.response_type,
+                'chat_id': chat.pk
+            }
+            on_event(instance.user.pk, 'chat', data)
+            on_event(instance.contact.pk, 'chat', data)

@@ -7,7 +7,7 @@ from ninja.errors import HttpError
 
 from auth.jwt_auth import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead
-from .models import Profile
+from .models import Profile, Contact
 
 from utils.utils import current_time_in_millis, save_image, delete_media
 from utils.models import ErrorMessage
@@ -39,10 +39,10 @@ def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[Upl
 
 @profile_router.get("/contacts", auth=AuthBearer(), response=List[ContactRead])
 def get_contacts(request):
-    return request.auth.contacts
+    return request.auth.contacts.filter(is_mutual=1)
 
 
-@profile_router.post("/contact/{user_id}", auth=AuthBearer(), response={200: ContactRead, 405: ErrorMessage})
+@profile_router.post("/contact/{user_id}", auth=AuthBearer(), response={200: ContactRead, 403: ErrorMessage, 405: ErrorMessage})
 def update_contact(request, user_id: int):
     profile = request.auth
 
@@ -58,13 +58,15 @@ def update_contact(request, user_id: int):
     else:
         contact = profile.contacts.create(contact=contacted_profile, last_contact=current_time_in_millis())
 
+    if contact.is_mutual == 0:
+        return 403, ErrorMessage.build("This user don't know you yet")
+
     return 200, contact
 
 
 @profile_router.get("/{user_id}", response=ContactRead, auth=AuthBearer())
 def get_user_profile(request, user_id: int):
-    contacts = request.auth.contacts
-    query = contacts.filter(contact__pk=user_id)
+    query = request.auth.contacts.filter(contact__pk=user_id, is_mutual=1)
     if query.exists():
         return query.get()
     raise HttpError(status_code=404, message="No user with this id")

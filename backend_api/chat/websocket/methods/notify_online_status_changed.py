@@ -15,7 +15,7 @@ class OnlineStatus(Enum):
 @database_sync_to_async
 def set_user_online_status(user: Profile, status: OnlineStatus):
     if status is OnlineStatus.OFFLINE:
-        set_user_is_online(user.pk)
+        set_user_is_offline(user.pk)
     else:
         set_user_is_online(user.pk)
 
@@ -28,8 +28,8 @@ class NotifyUserOnlineStatusChangedMethod(Method):
     async def process(consumer, data):
         user: Profile = consumer.scope['user']
 
-        # await set_user_online_status(user, data)
-        print(f"User status is changed: user_id: {user.pk}")
+        await set_user_online_status(user, data)
+        print(f"User status is changed: user_id: {user.pk}, status: {data}")
 
         for room_group_name in consumer.chat_group_names:
             await consumer.send_to_group(
