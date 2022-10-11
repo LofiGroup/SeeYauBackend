@@ -26,3 +26,9 @@ class ContactRead(Schema):
     @staticmethod
     def resolve_img_url(obj):
         return resolve_media_url(obj.contact.img_url)
+
+
+class LikeRead(Schema):
+    id: int
+    by_who: int = Field(alias="who.pk")
+    when: int

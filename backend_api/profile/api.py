@@ -6,19 +6,27 @@ from typing import List, Optional
 from ninja.errors import HttpError
 
 from auth.jwt_auth import AuthBearer
-from .schemas import ProfileRead, ProfileUpdate, ContactRead
+from .schemas import ProfileRead, ProfileUpdate, ContactRead, LikeRead
 from .models.profile import Profile
 
 from utils.utils import current_time_in_millis, save_image, delete_media
 from utils.models import ErrorMessage
 
-profile_router = Router()
+profile_router = Router(auth=AuthBearer())
 
 
-@profile_router.get("/me", response=ProfileRead, auth=AuthBearer())
+@profile_router.get("/me", response=ProfileRead)
 def get_me(request):
     profile = request.auth
     return profile
+
+
+@profile_router.get("/{user_id}", response=ContactRead)
+def get_user_profile(request, user_id: int):
+    query = request.auth.contacts.filter(contact__pk=user_id, is_mutual=1)
+    if query.exists():
+        return query.get()
+    raise HttpError(status_code=404, message="No user with this id")
 
 
 @profile_router.post("/me", auth=AuthBearer(), response=ProfileRead)
@@ -37,12 +45,12 @@ def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[Upl
     return profile
 
 
-@profile_router.get("/contacts", auth=AuthBearer(), response=List[ContactRead])
+@profile_router.get("/contacts", response=List[ContactRead])
 def get_contacts(request):
     return request.auth.contacts.filter(is_mutual=1)
 
 
-@profile_router.post("/contact/{user_id}", auth=AuthBearer(), response={200: ContactRead, 403: ErrorMessage, 405: ErrorMessage})
+@profile_router.post("/contact/{user_id}", response={200: ContactRead, 403: ErrorMessage, 405: ErrorMessage})
 def update_contact(request, user_id: int):
     profile = request.auth
 
@@ -64,9 +72,9 @@ def update_contact(request, user_id: int):
     return 200, contact
 
 
-@profile_router.get("/{user_id}", response=ContactRead, auth=AuthBearer())
-def get_user_profile(request, user_id: int):
-    query = request.auth.contacts.filter(contact__pk=user_id, is_mutual=1)
-    if query.exists():
-        return query.get()
-    raise HttpError(status_code=404, message="No user with this id")
+@profile_router.get("/likes", response=LikeRead)
+def get_likes(request, from_date: int):
+    profile = request.auth
+
+    profile.likes.filter(created_in__gt=from_date)
+

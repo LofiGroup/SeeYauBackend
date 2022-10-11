@@ -1,4 +1,5 @@
 from django.db.models import Model, CharField, ForeignKey, CASCADE, OneToOneField, BigIntegerField, ImageField, BooleanField
+from django.shortcuts import get_object_or_404
 from utils.utils import current_time_in_millis, IS_ONLINE
 
 
@@ -7,6 +8,10 @@ class Profile(Model):
     name = CharField(max_length=100)
     img_url = CharField(max_length=100, default='images/profile/blank.png')
     last_seen = BigIntegerField(default=current_time_in_millis())
+
+
+def get_profile_or_404(user_id: int):
+    return Profile.objects.get_object_or_404(pk=user_id)
 
 
 def create_or_update_profile(name: str, phone_number: str):
