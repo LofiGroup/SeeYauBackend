@@ -4,8 +4,6 @@ from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseNot
 
 from auth.jwt_auth import AuthBearer
 from .schemas import chat_to_chat_updates, chat_to_chat_update
-from .models.models import ChatRoom
-from profile.models import Profile
 
 chat_router = Router(auth=AuthBearer())
 

@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 
 from .jwt_auth import decrypt_token, authentication_error
 from utils.utils import parse_query_string
-from profile.models import Profile
+from profile.models.profile import Profile
 
 
 @database_sync_to_async

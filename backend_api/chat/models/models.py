@@ -2,11 +2,9 @@ from django.db.models import (Model, CharField, ForeignKey, CASCADE,
                               SET, ManyToManyField, BigIntegerField)
 from django.contrib.auth.models import User
 
-from profile.models import Profile
+from profile.models.profile import Profile
 from datetime import datetime
 from utils.utils import current_time_in_millis
-from profile.models import Contact
-from chat.consumer_api import notify_new_chat_is_created
 
 
 def get_sentinel_profile():
@@ -15,14 +13,6 @@ def get_sentinel_profile():
 
 def get_current_time():
     return datetime.utcnow().timestamp()
-
-
-class Friend(Model):
-    friend: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='friends')
-    friend_to: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='friends_to')
-
-    class Meta:
-        unique_together = [('friend', 'friend_to')]
 
 
 class ChatRoom(Model):
@@ -34,6 +24,9 @@ class ChatUser(Model):
     user = ForeignKey(Profile, on_delete=SET(get_sentinel_profile))
     joined_in = BigIntegerField(default=current_time_in_millis)
     read_in = BigIntegerField(default=current_time_in_millis)
+
+    class Meta:
+        unique_together = [('chat', 'user')]
 
 
 class ChatMessage(Model):

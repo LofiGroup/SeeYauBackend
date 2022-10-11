@@ -7,7 +7,7 @@ from ninja.errors import HttpError
 
 from auth.jwt_auth import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead
-from .models import Profile, Contact
+from .models.profile import Profile
 
 from utils.utils import current_time_in_millis, save_image, delete_media
 from utils.models import ErrorMessage

@@ -6,8 +6,7 @@ from django.core.cache import cache
 
 from .schemas import TokenSchema, VerifySchema, StartAuthSchema
 from .jwt_auth import AuthBearer, create_token, AuthKey, create_auth_token
-from profile.models import Profile
-from profile.model_dao import create_or_update_profile
+from profile.models.profile import Profile, create_or_update_profile
 from utils.models import ErrorMessage
 
 import json

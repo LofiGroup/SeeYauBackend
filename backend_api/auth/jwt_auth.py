@@ -9,7 +9,7 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from calendar import timegm
 from .schemas import TokenSchema
-from profile.models import Profile
+from profile.models.profile import Profile
 from utils.utils import current_time_in_millis
 from utils import time_constants as Time
 

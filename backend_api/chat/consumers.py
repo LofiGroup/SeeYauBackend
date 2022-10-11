@@ -5,7 +5,7 @@ from django.db.models import ObjectDoesNotExist
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models.models import ChatMessage, get_all_chats, ChatRoom, ChatUser
-from profile.models import Profile
+from profile.models.profile import Profile
 from .schemas import chat_message_to_dict
 from utils.utils import current_time_in_millis, IS_ONLINE
 

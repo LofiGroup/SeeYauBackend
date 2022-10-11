@@ -1,9 +1,7 @@
 from enum import Enum
 from channels.db import database_sync_to_async
 
-from profile.models import Profile
-from profile.model_dao import set_user_is_online, set_user_is_offline
-from utils.utils import current_time_in_millis, IS_ONLINE
+from profile.models.profile import Profile, set_user_is_online, set_user_is_offline
 from app.websocket.base_consumer import Method
 
 
