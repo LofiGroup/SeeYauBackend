@@ -30,7 +30,11 @@ def verify_code(request: HttpRequest, data: VerifySchema):
     if phone_number is None:
         return 401, ErrorMessage.build("Authentication error")
 
-    json_data = json.loads(cache.get(phone_number))
+    cache_data = cache.get(phone_number)
+    if cache_data is None:
+        return 401, ErrorMessage.build("Authentication error")
+
+    json_data = json.loads(cache_data)
     if json_data is None:
         return 401, ErrorMessage.build("Authentication error")
 

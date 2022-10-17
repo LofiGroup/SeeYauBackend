@@ -11,7 +11,7 @@ class Profile(Model):
 
 
 def get_profile_or_404(user_id: int):
-    return Profile.objects.get_object_or_404(pk=user_id)
+    return get_object_or_404(Profile, pk=user_id)
 
 
 def create_or_update_profile(name: str, phone_number: str):

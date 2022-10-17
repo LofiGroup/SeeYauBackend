@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from chat.models.models import ChatRoom
-from profile.models import Contact, Profile
+from profile.models.contact import Contact
 from app.websocket.websocket_on_event import on_event
 from app.websocket.base_consumer import Method
 
