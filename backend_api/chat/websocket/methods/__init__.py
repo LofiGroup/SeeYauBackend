@@ -8,5 +8,5 @@ methods = {
     ConnectToNewChatMethod.type: ConnectToNewChatMethod,
     MessageReceivedMethod.type: MessageReceivedMethod,
     MarkChatAsReadMethod.type: MarkChatAsReadMethod,
-    NotifyUserOnlineStatusChangedMethod.type: NotifyUserOnlineStatusChangedMethod
+    NotifyUserOnlineStatusChangedMethod.type: NotifyUserOnlineStatusChangedMethod,
 }

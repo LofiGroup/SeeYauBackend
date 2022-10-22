@@ -44,7 +44,7 @@ class AuthBearer(HttpBearer):
     def authenticate(self, request: HttpRequest, token: str):
         phone_number = decrypt_token(token)
         if not phone_number:
-            return None
+            raise authentication_error
         return get_object_or_404(Profile, phone_number=phone_number)
 
 

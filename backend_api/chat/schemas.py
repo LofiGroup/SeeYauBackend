@@ -35,7 +35,7 @@ def chat_to_chat_update(user, chat, from_date):
         "new_messages": [chat_message_to_dict(message) for message in query.all()],
         "partner_id": partner.user.pk,
         "last_visited": me.read_in,
-        "partner_last_visited": partner.read_in
+        "partner_last_visited": partner.read_in,
     }
     return chat_update
 

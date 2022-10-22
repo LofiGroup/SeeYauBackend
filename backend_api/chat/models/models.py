@@ -1,5 +1,5 @@
 from django.db.models import (Model, CharField, ForeignKey, CASCADE,
-                              SET, ManyToManyField, BigIntegerField)
+                              SET, ManyToManyField, BigIntegerField, BooleanField)
 from django.contrib.auth.models import User
 
 from profile.models.profile import Profile
@@ -8,7 +8,7 @@ from utils.utils import current_time_in_millis
 
 
 def get_sentinel_profile():
-    return User.objects.get_or_create(username='deleted')[0]
+    return Profile.objects.get_or_create(phone_number='deleted', name='deleted')
 
 
 def get_current_time():
@@ -17,6 +17,7 @@ def get_current_time():
 
 class ChatRoom(Model):
     users = ManyToManyField(to=Profile, through='ChatUser', related_name='chats')
+    is_private = BooleanField(default=1)
 
 
 class ChatUser(Model):

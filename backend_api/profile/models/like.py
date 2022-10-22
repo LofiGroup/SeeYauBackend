@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, ForeignKey, CASCADE, OneToOneField, BigIntegerField, ImageField, BooleanField
+from django.db.models import Model, CharField, ForeignKey, CASCADE, OneToOneField, BigIntegerField, ImageField, BooleanField, Q
 from .profile import Profile, get_profile_or_404
 from utils.utils import current_time_in_millis
 from app.websocket.websocket_on_event import on_send_message
@@ -15,13 +15,13 @@ class Like(Model):
         unique_together = [('who', 'whom')]
 
 
-def like_user(profile: Profile, user: Profile):
+def like(profile: Profile, user: Profile):
     (like, created) = profile.liked.update_or_create(whom=user, defaults={"is_liked": 1, "when": current_time_in_millis()})
     notify_like_is_changed(like)
     return like
 
 
-def remove_like(profile: Profile, user: Profile):
+def unlike(profile: Profile, user: Profile):
     query = profile.liked.filter(whom=user)
     if query.exists():
         query.update(is_liked=0, when=current_time_in_millis())
@@ -37,3 +37,7 @@ def notify_like_is_changed(like: Like):
 
 def get_likes_count(profile: Profile) -> int:
     return profile.likes.filter(is_liked=1).count()
+
+
+def get_all_likes(profile: Profile, from_date: int):
+    return Like.objects.filter(Q(who=profile) | Q(whom=profile)).filter(when__gt=from_date)

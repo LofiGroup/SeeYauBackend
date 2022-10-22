@@ -1,6 +1,7 @@
 from ninja import Schema, Field
 from utils.utils import resolve_media_url
 from .models.like import get_likes_count
+from .models.blacklist import BlackList
 
 
 class ProfileUpdate(Schema):
@@ -40,3 +41,10 @@ class LikeRead(Schema):
     to_whom: int = Field(alias="whom.pk")
     when: int
     is_liked: bool
+
+
+class BlackListRead(Schema):
+    id: int
+    by_who: int = Field(alias="who.pk")
+    to_whom: int = Field(alias="whom.pk")
+    when: int

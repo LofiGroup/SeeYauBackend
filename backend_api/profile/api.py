@@ -7,10 +7,12 @@ from ninja.errors import HttpError
 from django.http import HttpResponse, JsonResponse
 
 from auth.jwt_auth import AuthBearer
-from .schemas import ProfileRead, ProfileUpdate, ContactRead, LikeRead
+from .schemas import ProfileRead, ProfileUpdate, ContactRead, LikeRead, BlackListRead
 from .models.profile import Profile, get_profile_or_404
-import profile.models.like as like_dao
-from .models.contact import get_contacted_profile
+
+from .models.like import like, unlike, get_all_likes
+from .models.contact import get_contacted_profile, contacted_with
+from .models.blacklist import black_list_user, unblacklist_user, get_all_blacklists
 
 from utils.utils import current_time_in_millis, save_image, delete_media
 from utils.models import ErrorMessage
@@ -53,25 +55,14 @@ def get_contacts(request):
     return request.auth.contacts.filter(is_mutual=1)
 
 
-@profile_router.post("/contact/{user_id}", response={200: ContactRead, 403: ErrorMessage, 405: ErrorMessage})
+@profile_router.post("/contact/{user_id}", response={200: ContactRead, 403: ErrorMessage})
 def update_contact(request, user_id: int):
     profile = request.auth
 
-    if profile.pk == user_id:
-        return 405, ErrorMessage.build("You contacted with yourself? Really?")
-
-    contacted_profile = get_object_or_404(Profile, pk=user_id)
-
-    query = profile.contacts.filter(contact=contacted_profile)
-    if query.exists():
-        query.update(last_contact=current_time_in_millis())
-        contact = query.get()
-    else:
-        contact = profile.contacts.create(contact=contacted_profile, last_contact=current_time_in_millis())
+    contact = contacted_with(profile, user_id)
 
     if contact.is_mutual == 0:
         return 403, ErrorMessage.build("This user don't know you yet")
-
     return 200, contact
 
 
@@ -80,7 +71,7 @@ def like_user(request, user_id: int):
     profile = request.auth
     user = get_contacted_profile(profile, user_id)
 
-    return like_dao.like_user(profile, user)
+    return like(profile, user)
 
 
 @profile_router.post("/unlike/{user_id}")
@@ -88,12 +79,30 @@ def unlike_user(request, user_id: int):
     profile = request.auth
     user = get_contacted_profile(profile, user_id)
 
-    like_dao.remove_like(profile, user)
+    unlike(profile, user)
     return HttpResponse(status=204)
 
 
 @profile_router.get("/likes", response=List[LikeRead])
 def get_likes(request, from_date: int):
+    return get_all_likes(request.auth, from_date)
+
+
+@profile_router.post("/blacklist-user/{user_id}", response=BlackListRead)
+def blacklist_user(request, user_id: int):
     profile = request.auth
-    all = like_dao.Like.objects
-    return (all.filter(who=profile) | all.filter(whom=profile)).filter(when__gt=from_date)
+
+    return black_list_user(profile, user_id)
+
+
+@profile_router.post("/remove-from-blacklist/{user_id}", response=ContactRead)
+def remove_from_blacklist(request, user_id: int):
+    profile = request.auth
+
+    return unblacklist_user(profile, user_id)
+
+
+@profile_router.get("/get-blacklist", response=List[BlackListRead])
+def get_blacklist(request, from_date: int):
+    return get_all_blacklists(request.auth, from_date)
+

@@ -3,5 +3,5 @@ def like_to_response_model(like):
         "id": like.pk,
         "by_who": like.who.pk,
         "when": like.when,
-        "is_liked": like.is_liked
+        "is_liked": bool(like.is_liked)
     }
