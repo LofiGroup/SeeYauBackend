@@ -48,3 +48,4 @@ class BlackListRead(Schema):
     by_who: int = Field(alias="who.pk")
     to_whom: int = Field(alias="whom.pk")
     when: int
+    is_active: bool

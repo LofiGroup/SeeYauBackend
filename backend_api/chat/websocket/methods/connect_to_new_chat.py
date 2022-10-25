@@ -39,7 +39,7 @@ def check_if_contact_is_mutual(sender, instance: Contact, created, **kwargs):
             chat.users.add(instance.contact)
 
             data = {
-                'type': ConnectToNewChatMethod.response_type,
+                'type': ConnectToNewChatMethod.type,
                 'chat_id': chat.pk
             }
             on_event(instance.user.pk, 'chat', data)

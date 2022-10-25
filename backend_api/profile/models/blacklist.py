@@ -1,4 +1,4 @@
-from django.db.models import Model, ForeignKey, CASCADE, BigIntegerField, Q
+from django.db.models import Model, ForeignKey, CASCADE, BigIntegerField, Q, BooleanField
 from ninja.errors import HttpError
 
 from .profile import Profile, get_profile_or_404
@@ -11,6 +11,7 @@ class BlackList(Model):
     who: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='blacklist')
     whom: Profile = ForeignKey(Profile, on_delete=CASCADE, related_name='in_blacklist')
     when: int = BigIntegerField(default=current_time_in_millis)
+    is_active: bool = BooleanField(default=1)
 
     class Meta:
         unique_together = [('who', 'whom')]
@@ -19,20 +20,28 @@ class BlackList(Model):
 def black_list_user(profile: Profile, user_id: int) -> BlackList:
     query = profile.blacklist.filter(whom__pk=user_id)
 
-    if not query.exists():
-        user = get_profile_or_404(user_id)
+    user = get_profile_or_404(user_id)
 
+    if query.exists():
+        blacklist = query.get()
+        if blacklist.is_active:
+            raise HttpError(status_code=409, message="User is already in blacklist")
+
+        blacklist.is_active = 1
+        blacklist.save()
+    else:
         blacklist = profile.blacklist.create(whom=user)
-        delete_all_relating_data(blacklist)
-        return blacklist
-    raise HttpError(status_code=409, message="User is already in blacklist")
+    delete_all_relating_data(blacklist)
+    return blacklist
 
 
 def unblacklist_user(profile: Profile, user_id: int):
-    query = profile.blacklist.filter(whom__pk=user_id)
+    query = profile.blacklist.filter(whom__pk=user_id, is_active=1)
 
     if query.exists():
-        query.delete()
+        blacklist = query.get()
+        blacklist.is_active = 0
+        blacklist.save()
         return contacted_with(profile, user_id)
     raise HttpError(status_code=404, message="User is not in blacklist")
 
