@@ -5,8 +5,12 @@ class TokenSchema(Schema):
     access_token: str
 
 
+class VerifyResponse(Schema):
+    access_token: str
+    exists: bool
+
+
 class StartAuthSchema(Schema):
-    name: str
     phone_number: str
 
 
