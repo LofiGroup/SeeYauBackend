@@ -9,7 +9,7 @@ class Profile(Model):
     phone_number = CharField(max_length=100)
     name = CharField(max_length=100)
     img_url = CharField(max_length=100, default='images/profile/blank.png')
-    last_seen = BigIntegerField(default=current_time_in_millis())
+    last_seen = BigIntegerField(default=current_time_in_millis)
 
 
 def get_profile_or_404(user_id: int):

@@ -84,7 +84,8 @@ DATABASES = {
         'PORT': '3306',
         'TEST': {
             'NAME': 'test_seeyau'
-        }
+        },
+        'OPTIONS': {'charset': 'utf8mb4'}
     }
 }
 
