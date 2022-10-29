@@ -61,7 +61,18 @@ class Consumer:
             {
                 "type": "send_response",
                 "ctype": self.ctype,
-                "data": data
+                "data": data,
+            }
+        )
+
+    async def send_to_group_excluding_sender(self, group_name, data):
+        await self.channel_layer.group_send(
+            group_name,
+            {
+                "type": "send_response",
+                "ctype": self.ctype,
+                "data": data,
+                "sender_name": self.channel_name
             }
         )
 

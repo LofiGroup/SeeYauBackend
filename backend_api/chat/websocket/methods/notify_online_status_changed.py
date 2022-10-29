@@ -30,7 +30,7 @@ class NotifyUserOnlineStatusChangedMethod(Method):
         print(f"User status is changed: user_id: {user.pk}, status: {data}")
 
         for room_group_name in consumer.chat_group_names:
-            await consumer.send_to_group(
+            await consumer.send_to_group_excluding_sender(
                 room_group_name,
                 {
                     'type': NotifyUserOnlineStatusChangedMethod.response_type,

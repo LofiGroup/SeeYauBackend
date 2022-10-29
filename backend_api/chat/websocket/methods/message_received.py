@@ -26,23 +26,33 @@ class MessageReceivedMethod(Method):
     type = "chat_message"
     response_type = "new_message"
 
+    sender_response_type = "message_is_received"
+
     @staticmethod
     async def process(consumer, data: dict):
         message = data['message']
         chat_id = data['chat_id']
+        local_id = data['local_id']
 
         print(f"Received message: {message}, for chat: {chat_id}")
 
-        message = await save_message(chat_id, consumer.scope['user'], message)
+        message: ChatMessage = await save_message(chat_id, consumer.scope['user'], message)
 
         if await consumer.request_is_invalid(message, ChatMessage):
             return
 
-        await consumer.send_to_group(
+        message_data = chat_message_to_dict(message)
+        await consumer.send_to_group_excluding_sender(
             f'chat_{chat_id}',
             {
                 'type': MessageReceivedMethod.response_type,
                 'chat_id': chat_id,
-                'message': chat_message_to_dict(message)
+                'message': message_data
             }
         )
+        await consumer.send({
+            'type': MessageReceivedMethod.sender_response_type,
+            'local_id': local_id,
+            'real_id': message.pk,
+            'created_in': message.created_in
+        })

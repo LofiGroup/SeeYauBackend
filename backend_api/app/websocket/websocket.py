@@ -39,6 +39,10 @@ class MainConsumer(AsyncWebsocketConsumer):
         await self.consumers[request_type].on_receive_message(text_data_json['data'])
 
     async def send_response(self, event):
+        sender_channel_name = event.get("sender_name")
+        if sender_channel_name == self.channel_name:
+            return
+
         print(f"Sending through websocket: {event}")
         await self.send(text_data=json.dumps({
             'type': event['ctype'],

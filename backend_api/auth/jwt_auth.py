@@ -45,7 +45,10 @@ class AuthBearer(HttpBearer):
         phone_number = decrypt_token(token)
         if not phone_number:
             raise authentication_error
-        return get_object_or_404(Profile, phone_number=phone_number)
+        try:
+            return get_object_or_404(Profile, phone_number=phone_number)
+        except HttpError:
+            raise authentication_error
 
 
 class AuthKey(APIKeyQuery):
