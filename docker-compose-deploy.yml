@@ -17,7 +17,6 @@ services:
     build: ./backend_api
     entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
-      - static:/usr/src/app/static
       - ./utility:/usr/src/app/utility
     depends_on:
       - db
@@ -37,7 +36,8 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - static:/static
+      - ./backend_api/static:/static
+      - ./backend_api/media:/media
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
       - ./utility:/utility
@@ -69,6 +69,5 @@ services:
 
 volumes:
   db:
-  static:
   certbot-conf:
   certbot-www:
