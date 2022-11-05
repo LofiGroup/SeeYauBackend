@@ -22,3 +22,6 @@ use $db_name$;
 
 Mysql update all column in table:
 update $table_name$ set $column_name$ = $value$;
+
+Docker bash into container:
+docker exec -it <container name> /bin/bash

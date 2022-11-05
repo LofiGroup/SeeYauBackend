@@ -17,9 +17,9 @@ services:
     build: ./backend_api
     entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
-      - static:/usr/src/app/static
       - ./utility:/usr/src/app/utility
-      - certs:/etc/certs
+      - ./backend_api/static:/usr/src/app/static
+      - ./backend_api/media:/usr/src/app//media
     depends_on:
       - db
       - redis
@@ -38,7 +38,8 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - static:/static
+      - ./backend_api/static:/static
+      - ./backend_api/media:/media
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
       - ./utility:/utility
@@ -51,23 +52,24 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
-      BACKEND_ADDRESS: "seeyau_backend:8000"
+      BACKEND_ADDRESS: "seeyau_backend:80"
   certbot:
     build: ./certbot
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
+      - ./utility:/utility
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
-      IS_DEVELOPMENT_VERSION: ${IS_DEVELOPMENT_VERSION}
+      DEBUG: ${DEBUG}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
+      NGINX_ADDRESS: "nginx:80"
     depends_on:
       - nginx
 
 volumes:
   db:
-  static:
   certbot-conf:
   certbot-www:
