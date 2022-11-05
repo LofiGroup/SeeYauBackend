@@ -19,7 +19,6 @@ services:
     volumes:
       - static:/usr/src/app/static
       - ./utility:/usr/src/app/utility
-      - certs:/etc/certs
     depends_on:
       - db
       - redis
