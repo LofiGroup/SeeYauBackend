@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-chmod +x utility/wait_for_it.sh
- "utility/wait_for_it.sh -t \"${WAIT_FOR_IT_TIME}\" \"${BACKEND_ADDRESS}\" -- echo \"Backend is ready\""
+chmod +x /utility/wait_for_it.sh
+bash /utility/wait_for_it.sh "${BACKEND_ADDRESS}" -t "${WAIT_FOR_IT_TIME}" -- echo "Backend is ready"
 
 # If no certificates are obtained, create dummy ones to start the nginx
 if [ ! -d "${KEYS_FOLDER}" ]
