@@ -7,4 +7,4 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 #gunicorn --bind 0.0.0.0:80 app.asgi -w 2 -k uvicorn.workers.UvicornWorker
-daphne -p 80 app.asgi:application
+daphne -b 0.0.0.0 -p 80 app.asgi:application
