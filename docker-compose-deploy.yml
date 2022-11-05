@@ -18,6 +18,8 @@ services:
     entrypoint: ["sh", "./deploy-entrypoint.sh"]
     volumes:
       - ./utility:/usr/src/app/utility
+      - ./backend_api/static:/static
+      - ./backend_api/media:/media
     depends_on:
       - db
       - redis
