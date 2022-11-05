@@ -51,18 +51,20 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
-      BACKEND_ADDRESS: "seeyau_backend:8000"
+      BACKEND_ADDRESS: "seeyau_backend:80"
   certbot:
     build: ./certbot
     volumes:
       - certbot-conf:/etc/letsencrypt
       - certbot-www:/var/www/certbot
+      - ./utility:/utility
     environment:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
-      IS_DEVELOPMENT_VERSION: ${IS_DEVELOPMENT_VERSION}
+      IS_DEVELOPMENT_VERSION: ${IS_DEBUG_VERSION}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
+      NGINX_ADDRESS: "nginx:80"
     depends_on:
       - nginx
 
