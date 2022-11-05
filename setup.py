@@ -30,7 +30,6 @@ with open(".env", "w") as env:
         f"MYSQL_PASSWORD={db_password}\n",
         f"MYSQL_ROOT_PASSWORD={db_root_password}\n",
         f"WAIT_FOR_IT_TIME=60000\n",
-        f"IS_DEBUG_VERSION=false\n"
         f"DEBUG=0\n"
         f"SECRET_KEY={secret_key}\n"
     ])

@@ -61,7 +61,7 @@ services:
       CERTBOT_EMAIL: ${CERTBOT_EMAIL}
       KEYS_FOLDER: /etc/letsencrypt/live/${DOMAIN_NAME}
       DOMAIN_NAME: ${DOMAIN_NAME}
-      IS_DEVELOPMENT_VERSION: ${IS_DEBUG_VERSION}
+      DEBUG: ${DEBUG}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
       NGINX_ADDRESS: "nginx:80"
     depends_on:
