@@ -43,7 +43,7 @@ with open(".env", "w") as env:
         f"MYSQL_USER={db_user}\n",
         f"MYSQL_PASSWORD={db_password}\n",
         f"MYSQL_ROOT_PASSWORD={db_root_password}\n",
-        f"IS_PRODUCTION_VERSION={production_version}",
+        f"IS_PRODUCTION_VERSION={production_version}\n",
         f"WAIT_FOR_IT_TIME=60000\n",
         f"DEBUG=0\n"
         f"SECRET_KEY={secret_key}\n"
