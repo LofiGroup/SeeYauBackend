@@ -14,6 +14,20 @@ domain_name = input()
 print("Enter your email:")
 email = input()
 
+print("Should we deploy as the production version? y/n")
+while True:
+    production_version = input()
+    match production_version:
+        case "y":
+            production_version = 1
+            break
+        case "n":
+            production_version = 0
+            break
+        case _:
+            print("Cannot recognize the input, please try again.")
+
+
 db_user = "user_" + generate_random_string(5)
 db_name = "db_" + generate_random_string(5)
 db_password = generate_random_string(40)
@@ -29,6 +43,7 @@ with open(".env", "w") as env:
         f"MYSQL_USER={db_user}\n",
         f"MYSQL_PASSWORD={db_password}\n",
         f"MYSQL_ROOT_PASSWORD={db_root_password}\n",
+        f"IS_PRODUCTION_VERSION={production_version}",
         f"WAIT_FOR_IT_TIME=60000\n",
         f"DEBUG=0\n"
         f"SECRET_KEY={secret_key}\n"
