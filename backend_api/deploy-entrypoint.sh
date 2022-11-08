@@ -7,7 +7,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 
-if (( "$DEBUG" == 1 )); then
+if [[ $DEBUG == 1 ]]; then
   python run runporter.py
 fi
 
