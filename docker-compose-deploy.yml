@@ -15,7 +15,7 @@ services:
       - db:/var/lib/mysql
   seeyau_backend:
     build: ./backend_api
-    entrypoint: ["sh", "./deploy-entrypoint.sh"]
+    entrypoint: ["bash", "./deploy-entrypoint.sh"]
     volumes:
       - ./utility:/usr/src/app/utility
       - ./backend_api/static:/usr/src/app/static
