@@ -7,7 +7,7 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 
-if (( DEBUG == 1 )); then
+if (( IS_PRODUCTON_VERSION == 0 )); then
   echo "Running porter"
   python run runporter.py &
 fi
