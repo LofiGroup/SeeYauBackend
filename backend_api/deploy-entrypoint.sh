@@ -8,7 +8,8 @@ python manage.py collectstatic --noinput
 
 
 if (( DEBUG == 1 )); then
-  python run runporter.py
+  echo "Running porter"
+  python run runporter.py &
 fi
 
 
