@@ -6,7 +6,7 @@ from typing import List, Optional
 from ninja.errors import HttpError
 from django.http import HttpResponse, JsonResponse
 
-from auth.jwt_auth import AuthBearer
+from auth.bearers import AuthBearer
 from .schemas import ProfileRead, ProfileUpdate, ContactRead, LikeRead, BlackListRead
 from .models.profile import Profile, get_profile_or_404
 

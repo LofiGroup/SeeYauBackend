@@ -5,7 +5,8 @@ from django.http import HttpRequest, HttpResponse
 from django.core.cache import cache
 
 from .schemas import TokenSchema, VerifySchema, StartAuthSchema, VerifyResponse
-from .jwt_auth import AuthBearer, create_token, AuthKey, create_auth_token
+from .bearers import AuthBearer, AuthKey
+from .jwt_auth import create_token, create_auth_token
 from profile.models.profile import Profile, create_or_update_profile
 from utils.models import ErrorMessage
 
@@ -18,7 +19,7 @@ def auth(phone_number: str):
     exists = create_or_update_profile(phone_number)
     token = create_token(phone_number)
 
-    return VerifyResponse(access_token=token.access_token, exists=exists)
+    return VerifyResponse(access_token=token, exists=exists)
 
 
 def verify_request_is_valid(data: VerifySchema, verify: dict):
@@ -52,7 +53,7 @@ def start(request: HttpRequest, data: StartAuthSchema):
         'code': "1234",
     })
     cache.set(data.phone_number, cached_data, 5 * 60000)
-    return create_auth_token(data.phone_number)
+    return TokenSchema(access_token=create_auth_token(data.phone_number))
 
 
 @auth_router.get("/check", auth=AuthBearer())

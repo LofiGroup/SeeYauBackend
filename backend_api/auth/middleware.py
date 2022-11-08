@@ -1,8 +1,7 @@
-from django.shortcuts import get_object_or_404
 from django.db.models import ObjectDoesNotExist
 from channels.db import database_sync_to_async
 
-from .jwt_auth import decrypt_token, authentication_error
+from .bearers import decrypt_token, authentication_error
 from utils.utils import parse_query_string
 from profile.models.profile import Profile
 

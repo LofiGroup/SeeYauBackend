@@ -2,7 +2,7 @@ from ninja import Router
 
 from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseNotFound
 
-from auth.jwt_auth import AuthBearer
+from auth.bearers import AuthBearer
 from .schemas import chat_to_chat_updates, chat_to_chat_update
 
 chat_router = Router(auth=AuthBearer())

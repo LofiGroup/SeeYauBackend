@@ -29,7 +29,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN_NAME: ${DOMAIN_NAME}
+      DOMAIN_NAME: "192.168.1.105"
       KEYS_FOLDER: /etc/certs/${DOMAIN_NAME}
       WAIT_FOR_IT_TIME: ${WAIT_FOR_IT_TIME}
       BACKEND_ADDRESS: "192.168.1.105:8000"

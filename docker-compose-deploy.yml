@@ -36,6 +36,7 @@ services:
       DB_HOST: "db"
       DOMAIN_NAME: ${DOMAIN_NAME}
       COMPOSE_DOMAIN_NAME: "backend"
+      PORT: "80"
   nginx:
     build: ./nginx
     volumes:

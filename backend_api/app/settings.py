@@ -21,10 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = bool(int(os.environ.get("DEBUG", default=1)))
+IS_PRODUCTION_VERSION = bool(int(os.environ.get("IS_PRODUCTION_VERSION", default=0)))
 
 DOMAIN_NAME = os.environ.get("DOMAIN_NAME")
 
-ALLOWED_HOSTS = ['localhost', os.environ.get("COMPOSE_DOMAIN_NAME"), DOMAIN_NAME, "backend"]
+ALLOWED_HOSTS = ['localhost', "127.0.0.1", os.environ.get("COMPOSE_DOMAIN_NAME"), DOMAIN_NAME, "backend"]
 
 # Application definition
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'channels',
     'chat',
     'profile',
+    'debug'
 ]
 
 MIDDLEWARE = [
