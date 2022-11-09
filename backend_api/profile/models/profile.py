@@ -17,12 +17,13 @@ def get_profile_or_404(user_id: int):
 
 
 # true if already exists
-def create_or_update_profile(phone_number: str) -> bool:
+def create_or_update_profile(phone_number: str, name: str = "") -> bool:
     query = Profile.objects.filter(phone_number=phone_number)
     if query.exists():
         return True
     else:
-        name = f"User{randint(0, 1000000)}"
+        if name == "":
+            name = f"User{randint(0, 1000000)}"
         Profile.objects.create(name=name, phone_number=phone_number)
         return False
 

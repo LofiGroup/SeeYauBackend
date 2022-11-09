@@ -51,3 +51,11 @@ def resolve_media_url(url):
     media_url = settings.MEDIA_URL
 
     return f"https://{domain}{media_url}{url}"
+
+
+def entries_in_list(elements: list, array: list) -> bool:
+    for a in array:
+        for elem in elements:
+            if a == elem:
+                return True
+    return False

@@ -33,6 +33,9 @@ db_name = "db_" + generate_random_string(5)
 db_password = generate_random_string(40)
 db_root_password = generate_random_string(40)
 
+jwt_signing_key = generate_random_string(60)
+auth_signing_key = generate_random_string(60)
+
 secret_key = generate_random_string(50)
 
 with open(".env", "w") as env:
@@ -46,5 +49,7 @@ with open(".env", "w") as env:
         f"IS_PRODUCTION_VERSION={production_version}\n",
         f"WAIT_FOR_IT_TIME=60000\n",
         f"DEBUG=0\n"
-        f"SECRET_KEY={secret_key}\n"
+        f"SECRET_KEY={secret_key}\n",
+        f"JWT_SIGNING_KEY={jwt_signing_key}\n",
+        f"AUTH_ONLY_SIGNING_KEY={auth_signing_key}\n",
     ])

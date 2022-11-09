@@ -47,7 +47,6 @@ class TokenAuthMiddleWare:
     def get_token_from_query(cls, scope):
         queries = parse_query_string(scope['query_string'])
         token_key = queries.get('token', None)
-        print(f"Token form query: {token_key}")
         if not token_key:
             return None
         return token_key

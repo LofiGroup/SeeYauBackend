@@ -3,19 +3,15 @@
 chmod +x utility/wait_for_it.sh
 bash utility/wait_for_it.sh "${DB_HOST}":3306 -t "${WAIT_FOR_IT_TIME}" -- echo "Database is ready for commands"
 
-echo "Making migrations..."
-python manage.py makemigrations | exit 1
-
 echo "Migrating..."
-python manage.py migrate | exit 1
+python manage.py migrate
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 
 if (( IS_PRODUCTON_VERSION == 0 )); then
-  echo "Running porter"
-  python run runporter.py &
+  python runporter.py &
 fi
 
 

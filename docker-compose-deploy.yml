@@ -36,6 +36,8 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME}
       COMPOSE_DOMAIN_NAME: "backend"
       PORT: "80"
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+      AUTH_ONLY_SIGNING_KEY: ${AUTH_ONLY_SIGNING_KEY}
   nginx:
     build: ./nginx
     volumes:
