@@ -1,8 +1,23 @@
-#!/bin/sh
+#!/bin/bash
 
 chmod +x utility/wait_for_it.sh
-sh -c "utility/wait_for_it.sh -t \"${WAIT_FOR_IT_TIME}\" db:3306 -- echo \"Database is ready for commands\""
+bash utility/wait_for_it.sh "${DB_HOST}":3306 -t "${WAIT_FOR_IT_TIME}" -- echo "Database is ready for commands"
 
-python manage.py migrate
+echo "Making migrations..."
+python manage.py makemigrations | exit 1
 
-python manage.py runserver 0.0.0.0:8000
+echo "Migrating..."
+python manage.py migrate | exit 1
+
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+
+
+if (( IS_PRODUCTON_VERSION == 0 )); then
+  echo "Running porter"
+  python run runporter.py &
+fi
+
+
+#gunicorn --bind 0.0.0.0:80 app.asgi -w 2 -k uvicorn.workers.UvicornWorker
+daphne -b 0.0.0.0 -p 80 app.asgi:application

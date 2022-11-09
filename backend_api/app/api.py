@@ -24,6 +24,6 @@ admin_router = Router()
 admin_router.add_router("/profiles", profile_admin_router)
 api.add_router("/admin", admin_router)
 
-if not settings.IS_PRODUCTION_VERSION:
-    from debug.init import init_debug
-    init_debug()
+# if not settings.IS_PRODUCTION_VERSION:
+#     from debug.init import init_debug
+#     init_debug()
