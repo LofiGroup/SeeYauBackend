@@ -1,9 +1,9 @@
 from ninja import Router
 
-from django.http import HttpRequest, HttpResponse, JsonResponse, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseNotFound
 
 from auth.bearers import AuthBearer
-from .schemas import chat_to_chat_updates, chat_to_chat_update
+from .schemas import chats_to_chat_updates, chat_to_chat_update
 
 chat_router = Router(auth=AuthBearer())
 
@@ -13,7 +13,7 @@ def get_all_updates(request, from_date: int):
     user = request.auth
     chats = user.chats.all()
 
-    chat_updates = chat_to_chat_updates(user, chats, from_date)
+    chat_updates = chats_to_chat_updates(user, chats, from_date)
 
     return JsonResponse(chat_updates, safe=False)
 

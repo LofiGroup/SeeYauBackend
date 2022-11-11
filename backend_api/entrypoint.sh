@@ -10,9 +10,9 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 
-if (( IS_PRODUCTON_VERSION == 0 )); then
-  python runporter.py &
-fi
+#if (( IS_PRODUCTON_VERSION == 0 )); then
+#  python runporter.py &
+#fi
 
 
 #gunicorn --bind 0.0.0.0:80 app.asgi -w 2 -k uvicorn.workers.UvicornWorker

@@ -16,7 +16,7 @@ def chat_message_to_dict(message: ChatMessage):
     }
 
 
-def chat_to_chat_updates(user, chats, from_date):
+def chats_to_chat_updates(user, chats, from_date):
     chat_updates = []
 
     for chat in chats:
@@ -32,6 +32,7 @@ def chat_to_chat_update(user, chat, from_date):
 
     chat_update = {
         "id": chat.pk,
+        "created_in": chat.created_in,
         "new_messages": [chat_message_to_dict(message) for message in query.all()],
         "partner_id": partner.user.pk,
         "last_visited": me.read_in,

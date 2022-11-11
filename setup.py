@@ -36,6 +36,8 @@ db_root_password = generate_random_string(40)
 jwt_signing_key = generate_random_string(60)
 auth_signing_key = generate_random_string(60)
 
+admin_access_key = generate_random_string(60)
+
 secret_key = generate_random_string(50)
 
 with open(".env", "w") as env:
@@ -52,4 +54,5 @@ with open(".env", "w") as env:
         f"SECRET_KEY={secret_key}\n",
         f"JWT_SIGNING_KEY={jwt_signing_key}\n",
         f"AUTH_ONLY_SIGNING_KEY={auth_signing_key}\n",
+        f"ADMIN_ACCESS_KEY={admin_access_key}\n",
     ])

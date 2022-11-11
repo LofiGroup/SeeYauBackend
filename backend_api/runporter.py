@@ -56,7 +56,7 @@ def porter_client():
         on_close=on_close
     )
 
-    ws.run_forever(reconnect=10)
+    ws.run_forever(reconnect=100)
 
 
 if __name__ == '__main__':

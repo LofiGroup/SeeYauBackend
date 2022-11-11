@@ -38,6 +38,7 @@ services:
       PORT: "80"
       JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
       AUTH_ONLY_SIGNING_KEY: ${AUTH_ONLY_SIGNING_KEY}
+      ADMIN_ACCESS_KEY: ${ADMIN_ACCESS_KEY}
   nginx:
     build: ./nginx
     volumes:

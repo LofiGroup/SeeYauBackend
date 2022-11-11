@@ -1,6 +1,5 @@
 from django.db.models import (Model, CharField, ForeignKey, CASCADE,
                               SET, ManyToManyField, BigIntegerField, BooleanField)
-from django.contrib.auth.models import User
 
 from profile.models.profile import Profile
 from datetime import datetime
@@ -18,6 +17,7 @@ def get_current_time():
 class ChatRoom(Model):
     users = ManyToManyField(to=Profile, through='ChatUser', related_name='chats')
     is_private = BooleanField(default=1)
+    created_in = BigIntegerField(default=current_time_in_millis)
 
 
 class ChatUser(Model):
