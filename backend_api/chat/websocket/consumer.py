@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 
-from chat.models.models import get_all_chats
+from chat.models.crud import get_all_chats
 from .methods import methods, NotifyUserOnlineStatusChangedMethod, OnlineStatus
 
 from app.websocket.base_consumer import Consumer

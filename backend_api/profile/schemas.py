@@ -1,7 +1,6 @@
 from ninja import Schema, Field
 from utils.utils import resolve_media_url
 from .models.like import get_likes_count
-from .models.blacklist import BlackList
 
 
 class ProfileUpdate(Schema):

@@ -2,6 +2,7 @@ from django.db.models import (Model, CharField, ForeignKey, CASCADE,
                               SET, ManyToManyField, BigIntegerField, BooleanField)
 
 from profile.models.profile import Profile
+
 from datetime import datetime
 from utils.utils import current_time_in_millis
 
@@ -37,15 +38,7 @@ class ChatMessage(Model):
     author = ForeignKey(Profile, on_delete=SET(get_sentinel_profile), related_name='messages')
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name='messages')
 
+    message_type = CharField(max_length=50, default="plain")
+    media_uri = CharField(max_length=200, default=None, blank=True, null=True)
 
-def get_chat_room(room_name):
-    return ChatRoom.objects.get(pk=room_name)
-
-
-def get_all_chats(user: Profile):
-    return user.chats.all()
-
-
-def user_in_chat(user, chat):
-    return chat.users.filter(pk=user.pk).exists()
 

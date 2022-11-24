@@ -1,7 +1,7 @@
 from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from ninja.errors import HttpError
-from .models.models import get_chat_room, user_in_chat
+from .models.crud import get_chat_room, user_in_chat
 
 no_such_room = HttpError(status_code=404, message="No such room")
 no_access_to_room = HttpError(status_code=401, message="No access to room")

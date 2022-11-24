@@ -14,7 +14,7 @@ from .models.like import like, unlike, get_all_likes
 from .models.contact import get_contacted_profile, contacted_with
 from .models.blacklist import black_list_user, unblacklist_user, get_all_blacklists
 
-from utils.utils import current_time_in_millis, save_image, delete_media
+from utils.file import save_media, delete_media
 from utils.models import ErrorMessage
 
 profile_router = Router(auth=AuthBearer())
@@ -34,7 +34,7 @@ def update_profile(request, form: ProfileUpdate = Form(...), image: Optional[Upl
         profile.name = form.name
 
     if image is not None:
-        url = save_image(profile.pk, image)
+        url = save_media(profile.pk, "image/profile", image)
         delete_media(profile.img_url)
         profile.img_url = url
     profile.save()

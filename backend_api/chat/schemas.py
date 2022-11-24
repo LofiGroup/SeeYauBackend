@@ -1,19 +1,34 @@
 from ninja import Schema, Field
-from typing import List
-from datetime import datetime
-import json
 
-from .models.models import ChatMessage, ChatUser
+from .models.models import ChatUser
+from utils.utils import resolve_media_url
 
 
-def chat_message_to_dict(message: ChatMessage):
-    return {
-        "id": message.pk,
-        "message": message.message,
-        "created_in": message.created_in,
-        "author": message.author.pk,
-        "chat_id": message.chat.pk
-    }
+class ChatMessageCreate(Schema):
+    local_id: int
+    message: str
+    chat_id: int
+    message_type: str | None
+
+
+class ChatMessageRead(Schema):
+    id: int
+    message: str
+    chat_id: int
+    message_type: str
+    media_uri: str | None
+    created_in: int
+    author: int = Field(alias="author.pk")
+
+    @staticmethod
+    def resolve_media_uri(obj):
+        return resolve_media_url(obj.media_uri)
+
+
+class ChatMessageCreated(Schema):
+    local_id: int
+    real_id: int
+    created_in: int
 
 
 def chats_to_chat_updates(user, chats, from_date):
@@ -33,7 +48,7 @@ def chat_to_chat_update(user, chat, from_date):
     chat_update = {
         "id": chat.pk,
         "created_in": chat.created_in,
-        "new_messages": [chat_message_to_dict(message) for message in query.all()],
+        "new_messages": [ChatMessageRead.from_orm(message).dict() for message in query.all()],
         "partner_id": partner.user.pk,
         "last_visited": me.read_in,
         "partner_last_visited": partner.read_in,
