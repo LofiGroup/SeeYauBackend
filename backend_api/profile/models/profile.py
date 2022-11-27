@@ -8,7 +8,7 @@ from random import randint
 class Profile(Model):
     phone_number = CharField(max_length=100)
     name = CharField(max_length=100)
-    img_url = CharField(max_length=100, default='images/profile/blank.png')
+    img_url = CharField(max_length=100, default='image/profile/blank.png')
     last_seen = BigIntegerField(default=current_time_in_millis)
 
 

@@ -1,7 +1,7 @@
 from typing import Optional
+import json
 
 from ninja import Router, File, Form, UploadedFile
-from ninja.errors import HttpError
 from django.http import JsonResponse, HttpResponseNotFound, Http404
 from auth.bearers import AuthBearer
 from .schemas import chats_to_chat_updates, chat_to_chat_update, ChatMessageCreate, ChatMessageRead, ChatMessageCreated
@@ -9,6 +9,8 @@ from app.websocket.websocket_on_event import on_event
 from utils.file import save_media
 from .websocket.methods.notify_chat_group import NotifyChatGroupMethod
 from .models.crud import save_chat_message
+
+from utils.utils import resolve_media_url
 
 chat_router = Router(auth=AuthBearer())
 
@@ -43,7 +45,7 @@ def send_chat_media(request, message_create: ChatMessageCreate = Form(...), medi
     else:
         media_uri = save_media(file_prefix=user.pk, directory=message_create.message_type, file=media)
 
-    message = save_chat_message(user, message_create, media_uri)
+    message = save_chat_message(user, message_create, extra=resolve_extra(message_create.message_type, media_uri))
     if message is None:
         raise Http404()
 
@@ -60,3 +62,12 @@ def send_chat_media(request, message_create: ChatMessageCreate = Form(...), medi
         "real_id": message.pk,
         "created_in": message.created_in
     }
+
+
+def resolve_extra(message_type: str, media_uri: str):
+    extra = {"uri": resolve_media_url(media_uri)}
+
+    if message_type == "video":
+        extra["thumbnail_uri"] = ""
+
+    return json.dumps(extra)

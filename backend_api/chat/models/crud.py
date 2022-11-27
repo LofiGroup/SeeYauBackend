@@ -17,7 +17,7 @@ def user_in_chat(user, chat):
     return chat.users.filter(pk=user.pk).exists()
 
 
-def save_chat_message(user: Profile, message: ChatMessageCreate, media_uri: str = None) -> ChatMessage | None:
+def save_chat_message(user: Profile, message: ChatMessageCreate, extra: str = None) -> ChatMessage | None:
     try:
         chat = ChatRoom.objects.get(pk=message.chat_id)
     except ObjectDoesNotExist:
@@ -30,4 +30,4 @@ def save_chat_message(user: Profile, message: ChatMessageCreate, media_uri: str 
     if message_type is None:
         message_type = "plain"
 
-    return chat.messages.create(message=message.message, author=user, message_type=message_type, media_uri=media_uri)
+    return chat.messages.create(message=message.message, author=user, message_type=message_type, extra=extra)

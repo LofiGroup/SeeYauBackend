@@ -1,3 +1,5 @@
+import time
+
 from ninja import Router
 from ninja.errors import HttpError
 
@@ -59,3 +61,9 @@ def start(request: HttpRequest, data: StartAuthSchema):
 @auth_router.get("/check", auth=AuthBearer())
 def check(request: HttpRequest):
     return HttpResponse(status=204)
+
+
+@auth_router.get("/long-poll")
+def long_poll(request):
+    time.sleep(10)
+    return ""

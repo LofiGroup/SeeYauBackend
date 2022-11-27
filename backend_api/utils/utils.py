@@ -19,10 +19,10 @@ def resolve_media_url(url):
     if url is None or url == "":
         return ""
 
-    domain = settings.DOMAIN_NAME
+    domain_name = settings.DOMAIN_NAME
     media_url = settings.MEDIA_URL
 
-    return f"https://{domain}{media_url}{url}"
+    return f"https://{domain_name}{media_url}{url}"
 
 
 def entries_in_list(elements: list, array: list) -> bool:

@@ -39,6 +39,6 @@ class ChatMessage(Model):
     chat = ForeignKey(ChatRoom, on_delete=CASCADE, related_name='messages')
 
     message_type = CharField(max_length=50, default="plain")
-    media_uri = CharField(max_length=200, default=None, blank=True, null=True)
+    extra = CharField(max_length=2000, default=None, blank=True, null=True)
 
 

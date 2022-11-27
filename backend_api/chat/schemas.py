@@ -1,7 +1,6 @@
 from ninja import Schema, Field
 
 from .models.models import ChatUser
-from utils.utils import resolve_media_url
 
 
 class ChatMessageCreate(Schema):
@@ -16,13 +15,9 @@ class ChatMessageRead(Schema):
     message: str
     chat_id: int
     message_type: str
-    media_uri: str | None
+    extra: str | None
     created_in: int
     author: int = Field(alias="author.pk")
-
-    @staticmethod
-    def resolve_media_uri(obj):
-        return resolve_media_url(obj.media_uri)
 
 
 class ChatMessageCreated(Schema):

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('phone_number', models.CharField(max_length=100)),
                 ('name', models.CharField(max_length=100)),
-                ('img_url', models.CharField(default='images/profile/blank.png', max_length=100)),
+                ('img_url', models.CharField(default='image/profile/blank.png', max_length=100)),
                 ('last_seen', models.BigIntegerField(default=utils.utils.current_time_in_millis)),
             ],
         ),
