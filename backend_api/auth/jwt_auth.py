@@ -15,7 +15,7 @@ def decrypt_token(token: str, key: str = JWT_SIGNING_KEY):
     try:
         payload = jwt.decode(token, key, algorithms=["HS256"])
 
-        data: str = payload.get("sub")
+        data: int = payload.get("sub")
         if data is None:
             return None
 
@@ -24,20 +24,21 @@ def decrypt_token(token: str, key: str = JWT_SIGNING_KEY):
             return None
     except jwt.ExpiredSignatureError:
         return None
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as error:
+        print(error)
         return None
     return data
 
 
-def create_token(phone_number: str):
-    return get_new_token(phone_number, JWT_SIGNING_KEY, JWT_ACCESS_EXPIRY)
+def create_token(data: int):
+    return get_new_token(data, JWT_SIGNING_KEY, JWT_ACCESS_EXPIRY)
 
 
 def create_auth_token(phone_number: str):
     return get_new_token(phone_number, AUTH_ONLY_SIGNING_KEY, AUTH_ONLY_ACCESS_EXPIRY)
 
 
-def get_new_token(data: str, key: str, expiry: int):
+def get_new_token(data: int, key: str, expiry: int):
     expires_in = (current_time_in_millis() + expiry) // 1000
     data = {"sub": data, "exp": expires_in}
     return jwt.encode(data, key, algorithm="HS256")

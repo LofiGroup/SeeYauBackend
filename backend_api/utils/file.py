@@ -1,11 +1,12 @@
 import os
+import json
 from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import UploadedFile
 from django.conf import settings
 
-from .utils import current_time_in_millis
+from .utils import current_time_in_millis, resolve_media_url
 
 
 def save_media(file_prefix: str, directory: str, file: UploadedFile):
@@ -30,3 +31,17 @@ def save_file(file_name: str, file: UploadedFile):
         for chunk in file.chunks():
             destination.write(chunk)
     return file_name
+
+
+def get_file_name_from_path(file_name: str) -> str:
+    split = file_name.split("/")
+    return split[-1]
+
+
+def resolve_extra(message_type: str, media_uri: str):
+    extra = {"uri": resolve_media_url(media_uri)}
+
+    if message_type == "video":
+        extra["thumbnail_uri"] = ""
+
+    return json.dumps(extra)

@@ -11,11 +11,11 @@ authentication_error = HttpError(status_code=401, message="Authentication error"
 
 class AuthBearer(HttpBearer):
     def authenticate(self, request: HttpRequest, token: str):
-        phone_number = decrypt_token(token)
-        if not phone_number:
+        pk = decrypt_token(token)
+        if not pk:
             raise authentication_error
         try:
-            return get_object_or_404(Profile, phone_number=phone_number)
+            return get_object_or_404(Profile, pk=pk)
         except HttpError:
             raise authentication_error
 

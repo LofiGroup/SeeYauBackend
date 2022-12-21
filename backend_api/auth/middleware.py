@@ -8,11 +8,11 @@ from profile.models.profile import Profile
 
 @database_sync_to_async
 def get_user(token):
-    phone_number = decrypt_token(token)
-    if not phone_number:
+    pk = decrypt_token(token)
+    if not pk:
         return None
     try:
-        return Profile.objects.filter(phone_number=phone_number).get()
+        return Profile.objects.filter(pk=pk).get()
     except ObjectDoesNotExist:
         return None
 

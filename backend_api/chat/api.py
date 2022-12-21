@@ -1,5 +1,4 @@
 from typing import Optional
-import json
 
 from ninja import Router, File, Form, UploadedFile
 from django.http import JsonResponse, HttpResponseNotFound, Http404
@@ -10,7 +9,7 @@ from utils.file import save_media
 from .websocket.methods.notify_chat_group import NotifyChatGroupMethod
 from .models.crud import save_chat_message
 
-from utils.utils import resolve_media_url
+from utils.file import resolve_extra
 
 chat_router = Router(auth=AuthBearer())
 
@@ -63,11 +62,3 @@ def send_chat_media(request, message_create: ChatMessageCreate = Form(...), medi
         "created_in": message.created_in
     }
 
-
-def resolve_extra(message_type: str, media_uri: str):
-    extra = {"uri": resolve_media_url(media_uri)}
-
-    if message_type == "video":
-        extra["thumbnail_uri"] = ""
-
-    return json.dumps(extra)

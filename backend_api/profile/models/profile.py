@@ -28,6 +28,11 @@ def create_or_update_profile(phone_number: str, name: str = "") -> bool:
         return False
 
 
+def create_profile_without_phone() -> Profile:
+    profile = Profile.objects.create(name="", phone_number="")
+    return profile
+
+
 def set_user_is_online(user_id: int):
     query = Profile.objects.filter(pk=user_id)
     if query.exists():
