@@ -14,6 +14,8 @@ class AuthBearer(HttpBearer):
         pk = decrypt_token(token)
         if not pk:
             raise authentication_error
+        elif pk is not int:
+            raise authentication_error
         try:
             return get_object_or_404(Profile, pk=pk)
         except HttpError:

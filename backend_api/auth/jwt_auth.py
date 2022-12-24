@@ -27,8 +27,6 @@ def decrypt_token(token: str, key: str = JWT_SIGNING_KEY):
     except jwt.PyJWTError as error:
         print(error)
         return None
-    except Exception:
-        return None
     return data
 
 
