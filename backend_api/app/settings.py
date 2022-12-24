@@ -116,6 +116,9 @@ CACHES = {
     }
 }
 
+
+CSRF_TRUSTED_ORIGINS = [f"https://{DOMAIN_NAME}"]
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
