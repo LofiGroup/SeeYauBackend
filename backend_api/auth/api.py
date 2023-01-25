@@ -8,10 +8,10 @@ from utils.file import save_media, delete_media
 from django.http import HttpRequest, HttpResponse
 from django.core.cache import cache
 
-from .schemas import TokenSchema, VerifySchema, StartAuthSchema, VerifyResponse
+from .schemas import TokenSchema, VerifySchema, StartAuthSchema, VerifyResponse, FirebaseTokenSchema
 from .bearers import AuthBearer, AuthKey
 from .jwt_auth import create_token, create_auth_token
-from profile.models.profile import Profile, create_or_update_profile, create_profile_without_phone
+from profile.models.profile import Profile, create_or_update_profile, create_profile_without_phone, set_user_firebase_token
 from utils.models import ErrorMessage
 
 import json
@@ -75,3 +75,8 @@ def quick_auth(request: HttpRequest, image: Optional[UploadedFile] = File(None))
 @auth_router.get("/check", auth=AuthBearer())
 def check(request: HttpRequest):
     return HttpResponse(status=204)
+
+
+@auth_router.post("/update-firebase-token", auth=AuthBearer())
+def update_firebase_token(request: HttpRequest, data: FirebaseTokenSchema):
+    set_user_firebase_token(request.auth.pk, data.token)

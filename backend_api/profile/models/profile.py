@@ -10,6 +10,7 @@ class Profile(Model):
     name = CharField(max_length=100)
     img_url = CharField(max_length=100, default='image/profile/blank.png')
     last_seen = BigIntegerField(default=current_time_in_millis)
+    firebase_token = CharField(max_length=300, default=None, null=True, blank=True)
 
 
 def get_profile_or_404(user_id: int):
@@ -43,3 +44,9 @@ def set_user_is_offline(user_id: int):
     query = Profile.objects.filter(pk=user_id)
     if query.exists():
         query.update(last_seen=current_time_in_millis())
+
+
+def set_user_firebase_token(user_id: int, token: str):
+    query = Profile.objects.filter(pk=user_id)
+    if query.exists():
+        query.update(firebase_token=token)

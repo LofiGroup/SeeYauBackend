@@ -16,3 +16,7 @@ class StartAuthSchema(Schema):
 
 class VerifySchema(Schema):
     code: str
+
+
+class FirebaseTokenSchema(Schema):
+    token: str

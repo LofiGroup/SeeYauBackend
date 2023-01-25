@@ -18,7 +18,7 @@ services:
     volumes:
       - ./utility:/usr/src/app/utility
       - ./backend_api/static:/usr/src/app/static
-      - ./backend_api/media:/usr/src/app//media
+      - ./backend_api/media:/usr/src/app/media
     depends_on:
       - db
       - redis

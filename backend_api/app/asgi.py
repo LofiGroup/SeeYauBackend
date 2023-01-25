@@ -33,6 +33,9 @@ application = ProtocolTypeRouter({
 import sys
 from debug.init import init_debug
 from utils.utils import entries_in_list
+from firebase_admin import initialize_app
+
+initialize_app()
 
 if not entries_in_list(["makemigrations", "migrate", "collectstatic"], sys.argv[1:]) and not settings.IS_PRODUCTION_VERSION:
     print("Initializing debug version")

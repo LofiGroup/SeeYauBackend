@@ -3,6 +3,8 @@ from django.db.models import ObjectDoesNotExist
 from chat.schemas import ChatMessageCreate
 from .models import ChatRoom, ChatMessage
 from profile.models.profile import Profile
+from utils.utils import IS_ONLINE
+from chat.firebase_messaging import sync_data
 
 
 def get_chat_room(room_name):
@@ -29,5 +31,9 @@ def save_chat_message(user: Profile, message: ChatMessageCreate, extra: str = No
     message_type = message.message_type
     if message_type is None:
         message_type = "plain"
+
+    partner: Profile = chat.users.exclude(pk=user.pk).get()
+    if partner.last_seen != IS_ONLINE:
+        sync_data(partner)
 
     return chat.messages.create(message=message.message, author=user, message_type=message_type, extra=extra)
