@@ -19,7 +19,7 @@ def user_in_chat(user, chat):
     return chat.users.filter(pk=user.pk).exists()
 
 
-def save_chat_message(user: Profile, message: ChatMessageCreate, extra: str = None) -> ChatMessage | None:
+def save_chat_message(user: Profile, message: ChatMessageCreate, extra: str = "") -> ChatMessage | None:
     try:
         chat = ChatRoom.objects.get(pk=message.chat_id)
     except ObjectDoesNotExist:

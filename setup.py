@@ -27,7 +27,6 @@ while True:
         case _:
             print("Cannot recognize the input, please try again.")
 
-
 db_user = "user_" + generate_random_string(5)
 db_name = "db_" + generate_random_string(5)
 db_password = generate_random_string(40)
